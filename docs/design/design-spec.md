@@ -41,9 +41,9 @@ dark colours as separate `color/dark/…` variables because its free plan allows
 | Border, strong (inputs)  | `--color-border-strong`          | `borderStrong`         | `#8895A1` | `#6B7A88` |
 | Text, primary            | `--color-text-primary`           | `textPrimary`          | `#14202B` | `#EEF2F5` |
 | Text, secondary          | `--color-text-secondary`         | `textSecondary`        | `#51606E` | `#A9B6C2` |
-| Nearby distance (web)    | `--color-distance-near`          | —                      | `#166144` | `#8FE3B1` |
-| Mid-range distance (web) | `--color-distance-medium`        | —                      | `#785300` | `#F3CD76` |
-| Farther distance (web)   | `--color-distance-far`           | —                      | `#A82B38` | `#FF9DA0` |
+| Nearby distance          | `--color-distance-near`          | `distanceNear`         | `#166144` | `#8FE3B1` |
+| Mid-range distance       | `--color-distance-medium`        | `distanceMedium`       | `#785300` | `#F3CD76` |
+| Farther distance         | `--color-distance-far`           | `distanceFar`          | `#A82B38` | `#FF9DA0` |
 | Accent (marker, pin)     | `--color-accent-default`         | `accentDefault`        | `#0B7A5A` | `#3FBF8F` |
 | Interactive, primary     | `--color-interactive-primary`    | `interactivePrimary`   | `#0B7A5A` | `#3FBF8F` |
 | On primary               | `--color-interactive-on-primary` | `interactiveOnPrimary` | `#FFFFFF` | `#0D141B` |
@@ -139,9 +139,9 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 ### Pharmacy result row
 
-- The name wraps. Web places the distance at the right edge of the row and shows the value and unit
-  alone. The displayed distance is green below 500 m, amber from 500 m to under 1 km, and red
-  from 1 km upward. On iOS the distance is below the name. Rows have a subtle border and radius 12. Desktop padding is 12 px vertical and 16 px horizontal. Narrow web uses 4 px vertical and
+- The name wraps. Both platforms place the distance at the right edge of the row and show the value
+  and unit alone. The displayed distance is green below 500 m, amber from 500 m to under 1 km, and
+  red from 1 km upward. Rows have a subtle border and radius 12. Desktop padding is 12 px vertical and 16 px horizontal. Narrow web uses 4 px vertical and
   8 px horizontal with a 44 px minimum row height and 4 px between rows.
 - Selected: 2 px selection border, selection surface fill. Text does not move.
 - The whole row is one button. Its accessible name is "{name}, {distance}", and it exposes the
@@ -186,18 +186,25 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
   top when taller. Opening hours sit beside the name, distance and address when the drawer
   content is at least 33rem wide. At smaller widths, the two sections stack and share a left edge
   in a block sized to its content. A 16 px gap separates the sections whenever they stack.
+- iPhone: the details form the same block, at most 448 points wide, centred below "Back to
+  results" when it fits and scrolling from the top when taller.
 - Notices (location, search, border, outside Finland) appear at the top of the list, above the rows.
 
 ## Layouts
 
-| Layout      | Width         | Structure                                                                                                                                                                |
-| ----------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Desktop web | 900 px and up | Left panel 400 wide: origin search, notices and list. Map fills the rest, with the details card over its top-left corner. Attribution bottom right.                      |
-| Narrow web  | below 900 px  | Origin search on top, map below, results sheet over the map: collapsed to controls, expanded to 55 % of the map area. Smallest checked width 320.                        |
-| iPhone      | all sizes     | Full-screen MapKit map. Sheet with detents: small (header plus nearest row), medium, large. Search field at the top of the sheet. Smallest checked: iPhone SE 375 × 667. |
+| Layout      | Width         | Structure                                                                                                                                                                                                                                        |
+| ----------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Desktop web | 900 px and up | Left panel 400 wide: origin search, notices and list. Map fills the rest, with the details card over its top-left corner. Attribution bottom right.                                                                                              |
+| Narrow web  | below 900 px  | Origin search on top, map below, results sheet over the map: collapsed to controls, expanded to 55 % of the map area. Smallest checked width 320.                                                                                                |
+| iPhone      | all sizes     | Full-screen MapKit map. Sheet with detents: closed (search field only), medium (the map and the nearest rows; the first launch opens here), large (covers the map). Search field at the top of the sheet. Smallest checked: iPhone SE 375 × 667. |
 
 - The first launch shows the default origin and its results before any prompt.
-- The iPhone sheet keeps its detent when a pharmacy is selected. Content scrolls within the sheet.
+- The iPhone sheet keeps its medium detent when a pharmacy is selected. A closed sheet opens to
+  the medium detent, like the narrow web drawer, and a large sheet comes down to it, so the map
+  shows the selected pin. Closed with a selection, the sheet shows only the selected name and its
+  coloured distance, like its row; tapping it opens the sheet, where "Back to results" and the
+  details return.
+  Content scrolls within the sheet.
 - At the largest text sizes (iOS accessibility sizes, 200 % browser text) a long name such as
   "Vaara-Karjalan apteekki (Heinävaaran palvelupiste)" wraps over several lines. The iPhone sheet
   opens at the medium detent so at least one full row is visible.
