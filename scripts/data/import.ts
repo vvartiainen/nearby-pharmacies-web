@@ -1,11 +1,3 @@
-// Builds the bundled pharmacy snapshot, place index, manifest and ODbL notice.
-//
-//   pnpm run data:import -- --input finland-latest.osm.pbf --region fi
-//   pnpm run data:import -- --overpass /tmp/task3a/finland.json --region fi   (interim snapshot)
-//
-// Options: --out-dir (default src/data), --source-url, --region-filter boundary|extract,
-// --municipality-admin-level (default 8). See docs/data/README.md.
-
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { parseArgs } from "node:util";

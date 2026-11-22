@@ -272,7 +272,6 @@ test("a map pick wins over a pending geocoder response", async ({ page }) => {
       finished.resolve();
     }
   });
-  // Without the address index, the chosen point keeps its plain label.
   await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await page.goto("/");
   try {
@@ -320,8 +319,6 @@ test("panning alone keeps the origin and choosing on the map can be cancelled", 
   await expect(page.getByRole("button", { name: "Search from here" })).toHaveCount(0);
   await expect(page.locator(".map-picker__target")).toHaveCount(0);
 
-  // "Choose on map" is centred over the map and turns into "Search from here" in place, with
-  // Cancel beside it; the pair stays centred.
   const mapBox = (await page.locator(".map-area").boundingBox())!;
   const mapCentre = mapBox.x + mapBox.width / 2;
   const choose = page.getByRole("button", { name: "Choose on map" });

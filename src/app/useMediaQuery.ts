@@ -1,6 +1,5 @@
 import { useCallback, useSyncExternalStore } from "react";
 
-/** Subscribes to a CSS media query, so layout behaviour follows the same breakpoint as the CSS. */
 export function useMediaQuery(query: string): boolean {
   const subscribe = useCallback(
     (onChange: () => void) => {

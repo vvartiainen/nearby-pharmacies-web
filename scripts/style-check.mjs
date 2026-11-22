@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-// Check-only Oxlint and Oxfmt run over changed and new files in this repository.
-//
-//   node scripts/style-check.mjs          exit 0 when clean, 1 with diagnostics on failure
-//   node scripts/style-check.mjs --hook   agent Stop hook mode for Claude Code and Codex
-//
-// Files checked: tracked files with staged or unstaged changes plus untracked files that Git does
-// not ignore. Deleted files, symlinks, pnpm-lock.yaml, generated src/data/*.json and unsupported
-// extensions are skipped.
-// Nothing is rewritten.
 
 import { spawnSync } from "node:child_process";
 import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";

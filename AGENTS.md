@@ -7,7 +7,7 @@ OSM tiles, a pin per listed pharmacy and the origin marker, and details with ope
 selected pharmacy. The starting point can come from a city or address search, device location, or
 a point chosen on the map. The layouts and text follow `docs/design/design-spec.md`. The repo also
 holds the OSM data importer, the bundled
-pharmacy snapshot in `src/data/`, the ranking code in `src/ranking/` and the shared ranking fixture
+pharmacy snapshot in `src/data/`, the ranking code in `src/features/pharmacies/rank.ts` and the shared ranking fixture
 in `fixtures/ranking/`, which is also used by the iOS app. `README.md` summarises the product
 decisions for reviewers; the ADRs in `docs/adr/` record the data and provider choices.
 
@@ -16,20 +16,19 @@ Node 26+. `package.json` pins pnpm 12.21.0. Install dependencies from `pnpm-lock
 
 ## Source layout
 
-| Path                        | Contents                                                                                      |
-| --------------------------- | --------------------------------------------------------------------------------------------- |
-| `src/App.tsx`               | Page layout: origin bar, results panel or sheet, map                                          |
-| `src/app/state.ts`          | Origin, selection and sheet state (`appReducer`), `nearestPharmacies`, `pinPosition`          |
-| `src/app/format.ts`         | Display name with the "Unnamed pharmacy" fallback, address lines                              |
-| `src/components/`           | `ResultRow`, `PharmacyDetails`, `DetailsCard` (desktop), `HoursBlock`                         |
-| `src/origin/`               | Geocoder, bundled place fallback, nearby address lookup, origin requests and coverage notices |
-| `src/hours/`                | `interpretOpeningHours`: weekly view of common OSM `opening_hours` forms, else the raw text   |
-| `src/map/PharmacyMap.tsx`   | Leaflet map, pins, origin marker and the map point picker                                     |
-| `src/map/config.ts`         | Build-time tile settings                                                                      |
-| `src/ranking/`              | Haversine distance and ranking, checked against the shared fixture                            |
-| `src/i18n/`, `src/locales/` | Locale choice, distance and time formatting, English and Finnish messages                     |
-| `src/data/`                 | Generated pharmacy snapshot, place index, coverage geometry and manifest (never hand-edited)  |
-| `src/styles.css`            | Design tokens as CSS custom properties (light and dark) and both layouts                      |
+| Path                       | Contents                                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `src/app/`                 | Compose the origin bar, results panel, map and desktop details. Owns state that spans those features. |
+| `src/features/origin/`     | Origin model, search and coverage UI, geocoder, local places, device location and address lookup.     |
+| `src/features/pharmacies/` | Results panel, rows and details, ranking, distance formatting and opening hours.                      |
+| `src/features/map/`        | Leaflet map, pins, viewport, point picker and tile settings.                                          |
+| `src/shared/`              | Locale and message catalogs, coordinate math and base styles.                                         |
+| `src/data/`                | Generated snapshot, place index, coverage geometry and manifest.                                      |
+
+Keep UI, state, helpers, styles and unit tests with their feature. Compose features from
+`src/app/` and put code in `src/shared/` when it serves multiple features. Prefer clear names and
+structure over comments. Use comments for non-obvious reasons, constraints, or workarounds, and
+remove comments that restate the code.
 
 ## Setup
 
@@ -55,7 +54,7 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  11 passed (11)` and `Tests  156 passed (156)`                                                         |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  13 passed (13)` and `Tests  156 passed (156)`                                                         |
 | UI tests (Playwright Test)           | `pnpm run test:ui`                  | `51 passed` and `7 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
@@ -108,7 +107,7 @@ map, so keyboard users can pan with the arrow keys before choosing “Search fro
 Tiles follow ADR 0002: OSM Standard raster tiles from
 `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, max zoom 19, attribution
 "© OpenStreetMap contributors" linked to `https://www.openstreetmap.org/copyright`. These are
-build-time settings read in `src/map/config.ts`; override them when building, for example
+build-time settings read in `src/features/map/config.ts`; override them when building, for example
 `VITE_TILE_URL=https://tiles.example/{z}/{x}/{y}.png VITE_TILE_MAX_ZOOM=18 pnpm run build`. The
 other variables are `VITE_TILE_ATTRIBUTION` (text; default is the localized "Map attribution"
 message) and `VITE_TILE_ATTRIBUTION_URL`. Leaflet loads only the tiles in view; the app neither
@@ -117,12 +116,12 @@ keep real tiles to manual review and stub them in tests.
 
 ## Locale behaviour
 
-`src/i18n/locale.ts` walks `navigator.languages` in order and picks the first entry whose language
+`src/shared/i18n/locale.ts` walks `navigator.languages` in order and picks the first entry whose language
 is `fi` or `en`, so `fi-FI` and `en-GB` match. Anything else falls back to English. The app sets
 `<html lang>` and the page title to the chosen locale and formats the distance with
 `Intl.NumberFormat` for it: `1.7 km straight line` in English, `1,7 km linnuntietä` in Finnish
-(`formatDistance` in `src/i18n/distance.ts`, rounding as in the design spec and the fixture).
-Messages live in `src/locales/en.json` and `src/locales/fi.json`, worded exactly as the spec's
+(`formatDistance` in `src/features/pharmacies/distance.ts`, rounding as in the design spec and the fixture).
+Messages live in `src/shared/i18n/en.json` and `src/shared/i18n/fi.json`, worded exactly as the spec's
 "Interface text" table; a unit test keeps their keys in sync.
 
 ## Interactive review in the T3 shared browser

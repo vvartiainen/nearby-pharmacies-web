@@ -44,7 +44,6 @@ export interface PbfHandlers {
 const supportedFeatures = new Set(["OsmSchema-V0.6", "DenseNodes"]);
 const memberTypes = ["node", "way", "relation"] as const;
 
-/** Reads the whole file once, calling the handlers in file order. */
 export function readPbf(path: string, handlers: PbfHandlers): void {
   const fd = openSync(path, "r");
   try {

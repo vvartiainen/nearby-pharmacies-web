@@ -1,6 +1,6 @@
 import type { Pharmacy, PharmacyAddress } from "../../src/data/schema.ts";
-import { haversineMeters, type LatLon } from "../../src/ranking/haversine.ts";
-import { compareIds } from "../../src/ranking/rank.ts";
+import { haversineMeters, type LatLon } from "../../src/shared/geo/haversine.ts";
+import { compareIds } from "../../src/features/pharmacies/rank.ts";
 import { interiorPoint, pointInArea, type Ring } from "./geometry.ts";
 import type { Tags } from "./osm-pbf.ts";
 
@@ -8,7 +8,6 @@ import type { Tags } from "./osm-pbf.ts";
 export const DUPLICATE_RADIUS_METERS = 50;
 export const SAME_NAME_REVIEW_METERS = 1000;
 
-/** One `amenity=pharmacy` feature before normalization. */
 export interface RawFeature {
   id: string;
   tags: Tags;

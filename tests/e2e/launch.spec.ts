@@ -38,7 +38,6 @@ test.describe("English fallback for an unsupported browser language", () => {
     await expect(page.getByRole("region", { name: "Map of pharmacies" })).toBeVisible();
     await expect(page.locator(".pharmacy-pin")).toHaveCount(20);
     await expect(page.locator(".origin-marker")).toHaveCount(1);
-    // No details until something is selected.
     await expect(page.getByTestId("details")).toHaveCount(0);
     expect(tiles.urls.length).toBeGreaterThan(0);
   });

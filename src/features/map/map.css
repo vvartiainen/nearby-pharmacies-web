@@ -1,0 +1,197 @@
+.map-picker {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  z-index: 1000;
+  display: flex;
+  gap: var(--spacing-sm);
+  translate: -50% 0;
+}
+
+.map-picker__main,
+.map-picker__cancel {
+  min-height: var(--hit-target);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-default);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
+  cursor: pointer;
+}
+
+.map-picker__main {
+  padding: var(--spacing-xs) var(--spacing-lg);
+  border-radius: 999px;
+  color: var(--color-interactive-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.map-picker[data-picking] .map-picker__main {
+  border-color: var(--color-interactive-primary);
+  background: var(--color-interactive-primary);
+  color: var(--color-interactive-on-primary);
+}
+
+.map-picker__cancel {
+  display: grid;
+  place-items: center;
+  width: var(--hit-target);
+  padding: 0;
+  border-radius: 50%;
+  color: var(--color-text-primary);
+  animation: map-picker-cancel-in 0.2s ease-out;
+}
+
+.map-picker__cancel svg {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+@keyframes map-picker-cancel-in {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-picker__main {
+    transition: none;
+  }
+
+  .map-picker__cancel {
+    animation: none;
+  }
+}
+
+.map-picker__target {
+  fill: none;
+  stroke: #243e9e;
+}
+
+@media (min-width: 900px) {
+  .map-picker {
+    top: auto;
+    bottom: var(--spacing-xl);
+  }
+}
+
+/* The 44 px box carries focus; clicks hit only the visible shape, so overlapping boxes in dense
+   areas do not swallow clicks meant for the pin drawn underneath. */
+.leaflet-marker-icon.pharmacy-pin {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pharmacy-pin__body,
+.pharmacy-pin__cross {
+  pointer-events: visiblePainted;
+  cursor: pointer;
+}
+
+.pharmacy-pin:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 0;
+  border-radius: var(--radius-sm);
+}
+
+.pharmacy-pin__shape {
+  overflow: visible;
+  transform-origin: 50% 100%;
+  transition: transform 120ms ease;
+}
+
+.pharmacy-pin__body {
+  fill: var(--color-accent-default);
+  stroke: var(--color-pin-outline);
+  stroke-width: 2;
+}
+
+.pharmacy-pin__halo {
+  fill: none;
+  stroke: none;
+}
+
+.pharmacy-pin__cross {
+  fill: var(--color-interactive-on-primary);
+}
+
+.pharmacy-pin.is-selected .pharmacy-pin__shape {
+  transform: scale(1.5);
+}
+
+.map[data-has-selection] .pharmacy-pin:not(.is-selected) .pharmacy-pin__body {
+  fill: var(--color-pin-muted);
+}
+
+.pharmacy-pin.is-selected .pharmacy-pin__body {
+  fill: var(--color-pin-selected);
+  stroke-width: 2.5;
+}
+
+.pharmacy-pin.is-selected .pharmacy-pin__halo {
+  stroke: var(--color-selection-border);
+  stroke-width: 6;
+}
+
+.pharmacy-pin.is-selected .pharmacy-pin__cross {
+  fill: var(--color-pin-outline);
+}
+
+/* The origin marker lets clicks through to a pharmacy pin underneath. */
+.leaflet-marker-icon.origin-marker {
+  pointer-events: none;
+}
+
+.origin-marker__halo,
+.origin-marker__dot {
+  position: absolute;
+  border-radius: var(--radius-full);
+}
+
+.origin-marker__halo {
+  inset: 0;
+  background: color-mix(in srgb, var(--color-origin-marker) 25%, transparent);
+}
+
+.origin-marker__dot {
+  inset: 8px;
+  background: var(--color-origin-marker);
+  border: 3px solid var(--color-pin-outline);
+}
+
+.leaflet-container {
+  font-family: var(--font-family);
+}
+
+.leaflet-bar a,
+.leaflet-touch .leaflet-bar a {
+  width: var(--hit-target);
+  height: var(--hit-target);
+  line-height: var(--hit-target);
+  background: var(--color-surface-default);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-subtle);
+}
+
+.leaflet-bar a:hover {
+  background: var(--color-page-background);
+}
+
+.leaflet-container .leaflet-control-attribution {
+  padding: 2px var(--spacing-sm);
+  background: color-mix(in srgb, var(--color-surface-default) 88%, transparent);
+  color: var(--color-text-secondary);
+}
+
+.leaflet-container .leaflet-control-attribution a {
+  color: var(--color-interactive-primary);
+}

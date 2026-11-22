@@ -6,7 +6,6 @@ const tilePng = Buffer.from(
   "base64",
 );
 
-/** Tile requests seen by the stub, for tests that check the map asked for tiles. */
 export interface TileLog {
   readonly urls: string[];
 }
@@ -40,14 +39,12 @@ export const test = base.extend<{ tiles: TileLog }>({
 
 export { expect };
 
-/** The result row button for a pharmacy, by the start of its accessible name. */
 export function row(page: Page, name: string) {
   return page
     .getByRole("button", { name: new RegExp(`^${name}, `) })
     .and(page.locator(".result-row"));
 }
 
-/** The map pin for a pharmacy, by the start of its accessible name. */
 export function pin(page: Page, name: string) {
   return page
     .getByRole("button", { name: new RegExp(`^${name}, `) })

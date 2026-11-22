@@ -6,8 +6,8 @@
 // Memory is bounded by the selected features and their geometry, not by the extract size.
 
 import type { CoverageGeometry, Place, PlaceType } from "../../src/data/schema.ts";
-import type { LatLon } from "../../src/ranking/haversine.ts";
-import { compareIds } from "../../src/ranking/rank.ts";
+import type { LatLon } from "../../src/shared/geo/haversine.ts";
+import { compareIds } from "../../src/features/pharmacies/rank.ts";
 import {
   assembleRings,
   bboxCentre,
@@ -174,7 +174,6 @@ export function importPbf(path: string, options: PbfImportOptions): PbfImportRes
     return rings.map((ring) => positionsOf(ring)).filter((ring) => ring.length >= 4);
   };
 
-  // Pharmacy features.
   const features: RawFeature[] = [...pharmacyNodes];
   for (const { id, tags } of pharmacyWays) {
     const refs = wayRefs.get(id) ?? [];
@@ -211,7 +210,6 @@ export function importPbf(path: string, options: PbfImportOptions): PbfImportRes
     });
   }
 
-  // Region restriction.
   let regionRings: Ring[] | undefined;
   let regionBox: BBox | undefined;
   if (options.regionFilter === "boundary" && country) {
@@ -231,7 +229,6 @@ export function importPbf(path: string, options: PbfImportOptions): PbfImportRes
   const outsideRegion = features.filter((f) => !inRegion(f.centre)).map((f) => f.id);
   const outside = new Set(outsideRegion);
 
-  // Place index.
   const municipalityAreas = municipalities
     .map((relation) => {
       // Boundaries of neighbouring municipalities are often cut at the extract edge; those

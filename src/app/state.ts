@@ -1,44 +1,14 @@
-import type { Pharmacy } from "../data/schema";
-import type { LatLon } from "../ranking/haversine";
-import { rankPharmacies, type RankedPharmacy } from "../ranking/rank";
-
-/** How many nearest pharmacies the list and the map show. */
-export const resultLimit = 20;
-
-/** OSM node/25474663, Helsinki Central Railway Station, as in the ranking fixture. */
-export const defaultOrigin: Origin = { kind: "default", lat: 60.1720965, lon: 24.9412486 };
-
-/** The active starting point and the source of its label. */
-export type Origin = LatLon &
-  (
-    | { readonly kind: "default" | "device" | "pin" }
-    | {
-        readonly kind: "search";
-        readonly label: string;
-        readonly title: string;
-        readonly context: string;
-      }
-  );
+import { defaultOrigin, type Origin } from "../features/origin/origin";
 
 export type SelectionSource = "row" | "pin";
 
 export interface AppState {
   readonly origin: Origin;
-  /** One selected pharmacy drives the row, the pin and the details. */
   readonly selectedId: string | null;
   /** Row selections move focus to the details. Pin selections keep focus on the map. */
   readonly selectionSource: SelectionSource | null;
-  /**
-   * Whether the details of the selection are open: in the details card over the map on desktop, in
-   * place of the list in the narrow sheet.
-   */
   readonly view: "list" | "details";
-  /**
-   * Narrow layouts only: the results sheet in its peek or expanded state. Selection, returning to
-   * the list and a point chosen on the map expand it.
-   */
   readonly sheet: "peek" | "expanded";
-  /** True after leaving the details, so the list moves focus back to the selected row. */
   readonly restoreRowFocus: boolean;
   /** Increments with each selection so the map reacts to re-selecting the same pharmacy. */
   readonly selectionCount: number;
@@ -46,7 +16,6 @@ export interface AppState {
 
 export type AppAction =
   | { type: "select"; id: string; source: SelectionSource }
-  /** "Back to results" in the narrow sheet, or closing the desktop details card. */
   | { type: "backToResults" }
   | { type: "toggleSheet" }
   | { type: "setOrigin"; origin: Origin };
@@ -94,18 +63,4 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         restoreRowFocus: false,
       };
   }
-}
-
-/** The nearest pharmacies from the origin, in ranking order. Depends on the origin only. */
-export function nearestPharmacies(
-  origin: LatLon,
-  pharmacies: readonly Pharmacy[],
-  limit = resultLimit,
-): RankedPharmacy<Pharmacy>[] {
-  return rankPharmacies(origin, pharmacies).slice(0, limit);
-}
-
-/** The point where a pharmacy's pin is drawn: the interior point of an area, else its location. */
-export function pinPosition(pharmacy: Pharmacy): LatLon {
-  return pharmacy.pin ?? { lat: pharmacy.lat, lon: pharmacy.lon };
 }

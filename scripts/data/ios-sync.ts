@@ -1,12 +1,3 @@
-// Copies the bundled data, the coverage geometry, the street address index and the shared ranking
-// fixture into the iOS repository, or verifies that the copies there are identical.
-//
-//   pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios
-//   pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios
-//
-// Verify exits 1 when a copy is missing or its SHA-256 differs, or when the web manifest does not
-// match the files it lists. Options: --region (default fi), --data-dir (default src/data).
-
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -29,7 +20,6 @@ interface Manifest {
   files: Record<string, { path: string; sha256: string } | null>;
 }
 
-/** The files to copy, relative to the web repo root and the iOS repo root. */
 export function syncPlan(webRoot: string, iosRepo: string, region: string, dataDir: string) {
   const names = dataFileNames(region);
   const manifestPath = join(webRoot, dataDir, names.manifest);
@@ -54,7 +44,6 @@ export function syncPlan(webRoot: string, iosRepo: string, region: string, dataD
   if (existsSync(coveragePath)) {
     plan.push({ source: coveragePath, target: join(iosRepo, IOS_DATA_DIR, names.coverage) });
   }
-  // The street address index labels a device fix or a chosen point with a nearby address.
   const addressIndex = join(webRoot, ADDRESS_INDEX_DIR);
   if (existsSync(addressIndex)) {
     for (const name of readdirSync(addressIndex).toSorted()) {

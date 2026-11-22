@@ -5,7 +5,7 @@ import {
   addressCell,
   addressCoordinateScale,
   type AddressShard,
-} from "../../src/origin/addressGrid.ts";
+} from "../../src/features/origin/addressGrid.ts";
 import { bboxOf } from "./geometry.ts";
 import { NodeStore } from "./node-store.ts";
 import { readPbf, type Tags } from "./osm-pbf.ts";

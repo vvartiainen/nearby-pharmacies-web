@@ -1,5 +1,5 @@
 import polylabel from "polylabel";
-import type { LatLon } from "../../src/ranking/haversine.ts";
+import type { LatLon } from "../../src/shared/geo/haversine.ts";
 
 /** [lon, lat] in degrees. */
 export type Position = readonly [number, number];

@@ -7,7 +7,6 @@ const isDesktop = (testInfo: TestInfo) => testInfo.project.name === "desktop-chr
 const highestTileZoom = (urls: readonly string[]) =>
   Math.max(...urls.map((url) => Number(new URL(url).pathname.split("/")[1])));
 
-/** Leaves the details: "Back to results" in the narrow sheet, the close button on the desktop card. */
 async function leaveDetails(page: Page, testInfo: TestInfo) {
   const name = isDesktop(testInfo) ? "Close details" : "Back to results";
   await page.getByRole("button", { name }).click();
@@ -71,7 +70,6 @@ async function sheetHeight(page: Page) {
   return box!.height;
 }
 
-/** Open the results drawer when it is collapsed. */
 async function expandSheetIfNarrow(page: Page) {
   const toggle = page.getByRole("button", { name: "Results", exact: true });
   if ((await toggle.count()) > 0 && (await toggle.getAttribute("aria-expanded")) === "false") {
@@ -143,7 +141,6 @@ test("selecting a row zooms in, selects its pin and shows details with hours", a
     "Sat10:00–16:00",
     "SunClosed",
   ]);
-  // Selection never moves the origin.
   await expect(page.getByTestId("origin")).toHaveValue(
     "Helsinki Central Railway Station (default)",
   );
@@ -165,7 +162,6 @@ test("selecting a pin selects its row and shows details", async ({ page }, testI
   await expect(details.getByRole("heading", { level: 2 })).toHaveText(name);
   await expect(details).toContainText(/straight line/);
   await expect(details.getByTestId("hours")).toBeAttached();
-  // Focus stays on the pin; only a row activation moves it to the details.
   await expect(pin(page, name)).toBeFocused();
   await expectSelectionInView(page, pin(page, name), testInfo);
 
@@ -174,7 +170,6 @@ test("selecting a pin selects its row and shows details", async ({ page }, testI
   await expect(selectedRow).toHaveAttribute("aria-pressed", "true");
   await expect(selectedRow).toBeInViewport();
   await expect(page.locator('.result-row[aria-pressed="true"]')).toHaveCount(1);
-  // Selection never reranks.
   await expect(page.locator(".result-row__name").first()).toHaveText("Steissin Apteekki");
 });
 
@@ -251,7 +246,6 @@ test("desktop: the list stays and the details open in a card over the map", asyn
   await expect(row(page, "Steissin Apteekki")).toBeVisible();
   await expect(row(page, "Steissin Apteekki")).toHaveAttribute("aria-pressed", "true");
 
-  // The card is over the map, next to the panel, and within the map with the inset all round.
   const cardBox = (await card.boundingBox())!;
   const mapBox = (await page.getByTestId("map").boundingBox())!;
   expect(cardBox.x).toBeCloseTo(mapBox.x + 16, 0);
@@ -264,11 +258,9 @@ test("desktop: the list stays and the details open in a card over the map", asyn
   expect(closeBox.width).toBeGreaterThanOrEqual(44);
   expect(closeBox.height).toBeGreaterThanOrEqual(44);
 
-  // The zoom control is never under the card.
   const zoomBox = (await page.locator(".leaflet-control-zoom").boundingBox())!;
   expect(overlaps(cardBox, zoomBox)).toBe(false);
 
-  // Another row updates the same card in place.
   await card.evaluate((element) => element.setAttribute("data-probe", "same"));
   await row(page, "Kluuvin apteekki").click();
   await expect(card.getByRole("heading", { level: 2 })).toHaveText("Kluuvin apteekki");
@@ -279,14 +271,12 @@ test("desktop: the list stays and the details open in a card over the map", asyn
 
   await expectSelectionInView(page, pin(page, "Kluuvin apteekki"), testInfo);
 
-  // Close returns focus to the row and keeps the selection.
   await close.click();
   await expect(card).toHaveCount(0);
   await expect(row(page, "Kluuvin apteekki")).toBeFocused();
   await expect(row(page, "Kluuvin apteekki")).toHaveAttribute("aria-pressed", "true");
   await expect(pin(page, "Kluuvin apteekki")).toHaveAttribute("aria-pressed", "true");
 
-  // Escape inside the card does the same.
   await page.keyboard.press("Enter");
   await expect(card.getByRole("heading", { level: 2 })).toBeFocused();
   await page.keyboard.press("Escape");

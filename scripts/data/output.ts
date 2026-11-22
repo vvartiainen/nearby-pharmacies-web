@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { closeSync, openSync, readSync } from "node:fs";
 import type { Pharmacy, PharmacySnapshot, Place, PlaceIndex } from "../../src/data/schema.ts";
-import { EARTH_MEAN_RADIUS_METERS } from "../../src/ranking/haversine.ts";
+import { EARTH_MEAN_RADIUS_METERS } from "../../src/shared/geo/haversine.ts";
 import type { DroppedDuplicate, SameNamePair } from "./normalize.ts";
 
 /** Bump when the importer's output for the same input changes. */
