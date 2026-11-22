@@ -1,6 +1,20 @@
 {
   "title": "Nearby pharmacies",
-  "heading": "Nearby pharmacies",
-  "sampleCaption": "Example distance",
-  "straightLine": "{distance} straight line"
+  "originCaption": "Starting point",
+  "defaultOrigin": "Helsinki Central Railway Station (default)",
+  "results": "Results",
+  "resultsTitle": "Nearest pharmacies",
+  "scopeAndCount": "Mapped pharmacies in Finland · {count}",
+  "straightLine": "{distance} straight line",
+  "addressUnavailable": "Address unavailable",
+  "unnamedPharmacy": "Unnamed pharmacy",
+  "hoursHeading": "Opening hours",
+  "hoursUnavailable": "Hours unavailable",
+  "closed": "Closed",
+  "days": "Mon Tue Wed Thu Fri Sat Sun",
+  "backToResults": "Back to results",
+  "closeDetails": "Close details",
+  "detailsLabel": "Pharmacy details",
+  "mapAttribution": "© OpenStreetMap contributors",
+  "mapLabel": "Map of pharmacies"
 }

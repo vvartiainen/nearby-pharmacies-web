@@ -1,13 +1,30 @@
 # Nearby pharmacies web
 
-React, TypeScript and Vite shell for the nearest-pharmacy web app. The page shows a localized
-heading and one illustrative `1.7 km` straight-line distance. The repo also holds the OSM data
-importer, the bundled pharmacy snapshot in `src/data/`, the ranking code in `src/ranking/` and the
-shared ranking fixture in `fixtures/ranking/`, which is also used by the iOS app. There is no map
-or geocoder yet. Product decisions live outside this repo in the planning `PLAN.md`.
+React, TypeScript and Vite web app that lists the pharmacies nearest to a starting point in
+Finland. The page shows the labelled default origin (Helsinki Central Railway Station), the 20
+nearest pharmacies from the bundled snapshot ranked by straight-line distance, a Leaflet map with
+OSM tiles, a pin per listed pharmacy and the origin marker, and details with opening hours for the
+selected pharmacy. The layouts, tokens and texts follow `docs/design/design-spec.md`. There is no
+search, device location or pin drop yet. The repo also holds the OSM data importer, the bundled
+pharmacy snapshot in `src/data/`, the ranking code in `src/ranking/` and the shared ranking fixture
+in `fixtures/ranking/`, which is also used by the iOS app. Product decisions live outside this repo
+in the planning `PLAN.md`.
 
 Run every command from the repository root. Use Node 22.12 or later in the 22 series, Node 24, or
 Node 26+. `package.json` pins pnpm 12.21.0. Install dependencies from `pnpm-lock.yaml`.
+
+## Source layout
+
+| Path                      | Contents                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------- |
+| `src/App.tsx`             | Page layout: origin bar, results panel or sheet, map                                        |
+| `src/app/state.ts`        | Origin, selection and sheet state (`appReducer`), `nearestPharmacies`, `pinPosition`        |
+| `src/app/format.ts`       | Display name with the "Unnamed pharmacy" fallback, address lines                            |
+| `src/components/`         | `ResultRow`, `PharmacyDetails`, `DetailsCard` (desktop), `HoursBlock`                       |
+| `src/hours/`              | `interpretOpeningHours`: weekly view of common OSM `opening_hours` forms, else the raw text |
+| `src/map/PharmacyMap.tsx` | Leaflet map, pins and origin marker                                                         |
+| `src/map/config.ts`       | Build-time tile settings                                                                    |
+| `src/styles.css`          | Design tokens as CSS custom properties (light and dark) and both layouts                    |
 
 ## Setup
 
@@ -33,17 +50,38 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  5 passed (5)` and `Tests  96 passed (96)`                                                             |
-| UI launch smoke (Playwright Test)    | `pnpm run test:ui`                  | `4 passed`: English fallback and Finnish on `desktop-chromium` and `narrow-webkit`                                 |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  9 passed (9)` and `Tests  149 passed (149)`                                                           |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `22 passed` and `6 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |
 
 `pnpm run test:ui` runs `pnpm run build && pnpm exec vite preview --port 4317`, serving the app on
 `http://127.0.0.1:4317` for the run so it does not clash with a dev server on 5173. Each test sets
-the browser locale (`sv-SE` for the English fallback, `fi-FI` for Finnish), so results do not
-depend on the host language. Traces of failed tests are kept in `test-results/`; open the report
-with `pnpm exec playwright show-report`.
+the browser locale (`sv-SE` for the English fallback, `fi-FI` for Finnish, `en-GB` elsewhere), so
+results do not depend on the host language. Traces of failed tests are kept in `test-results/`;
+open the report with `pnpm exec playwright show-report`.
+
+The UI tests never contact a tile server. Import `test` and `expect` from
+`tests/e2e/support/test.ts`, not from `@playwright/test`: its automatic `tiles` fixture answers
+every `tile.openstreetmap.org` request with a 1 × 1 PNG, records the URLs in `tiles.urls`, and
+aborts any other request that does not go to the preview server. `tests/e2e/launch.spec.ts`
+covers both locales; `tests/e2e/selection.spec.ts` covers ranking, row and pin selection, details
+with hours, keyboard use, the desktop details card, the narrow sheet heights, panning and 320 px
+width. Pins near the station overlap at the initial zoom, so pointer tests pick a pin with
+`uncoveredPinName`.
+
+## Map tiles
+
+Tiles follow ADR 0002: OSM Standard raster tiles from
+`https://tile.openstreetmap.org/{z}/{x}/{y}.png`, max zoom 19, attribution
+"© OpenStreetMap contributors" linked to `https://www.openstreetmap.org/copyright`. These are
+build-time settings read in `src/map/config.ts`; override them when building, for example
+`VITE_TILE_URL=https://tiles.example/{z}/{x}/{y}.png VITE_TILE_MAX_ZOOM=18 pnpm run build`. The
+other variables are `VITE_TILE_ATTRIBUTION` (text; default is the localized "Map attribution"
+message) and `VITE_TILE_ATTRIBUTION_URL`. Leaflet loads only the tiles in view; the app neither
+prefetches tiles nor sets a `Referrer-Policy`. The OSM tile usage policy bans automated use, so
+keep real tiles to manual review and stub them in tests.
 
 ## Locale behaviour
 
@@ -52,19 +90,36 @@ is `fi` or `en`, so `fi-FI` and `en-GB` match. Anything else falls back to Engli
 `<html lang>` and the page title to the chosen locale and formats the distance with
 `Intl.NumberFormat` for it: `1.7 km straight line` in English, `1,7 km linnuntietä` in Finnish
 (`formatDistance` in `src/i18n/distance.ts`, rounding as in the design spec and the fixture).
-Messages live in `src/locales/en.json` and `src/locales/fi.json`; a unit test keeps their keys in
-sync.
+Messages live in `src/locales/en.json` and `src/locales/fi.json`, worded exactly as the spec's
+"Interface text" table; a unit test keeps their keys in sync.
 
 ## Interactive review in the T3 shared browser
 
+Manual review loads real OSM tiles; keep it light (a few page loads, no scripted panning).
+
 1. Start `pnpm run dev` as a background process and wait for `Local: http://127.0.0.1:5173/`.
-2. Open `http://127.0.0.1:5173/` in the T3 shared browser and take a snapshot. Expect a level-one
-   heading and the caption "Example distance" above `1.7 km straight line`
-   for an English or unsupported browser language.
-3. The shared browser uses its own language list, so check it with `navigator.languages` in the
+2. Open `http://127.0.0.1:5173/` in the T3 shared browser and take a snapshot. At 900 px and
+   wider, expect a 400 px left panel with the heading "Nearby pharmacies", the caption
+   "Starting point" above "Helsinki Central Railway Station (default)", "Nearest pharmacies",
+   "Mapped pharmacies in Finland · 784" and 20 rows starting with "Steissin Apteekki,
+   50 m". The map fills the rest, with 20 pins, the blue origin dot and
+   "© OpenStreetMap contributors" at the bottom right.
+3. Click a row or a pin. The selected pin grows, the other pharmacy pins turn gray, and the map
+   fits the starting point and the selected pin with a dashed blue line outlined in white. The row
+   stays selected in the list. A details card over the map's top-left corner shows the name, distance, address and "Opening
+   hours" from Monday to Sunday; the zoom control is at the top right. "Close details" or Escape
+   closes the card and returns focus to the row, which stays selected. Press Tab to reach the rows
+   and Enter to select one; the focus ring is blue.
+4. The shared browser uses its own language list, so check it with `navigator.languages` in the
    page before judging the locale. Both locales are covered deterministically by
    `pnpm run test:ui`.
-4. Resize to a narrow width (for example 390 px) to check the narrow layout, then stop the dev server.
+5. Resize below 900 px (for example 390 and 320 px): the results become a sheet over the map that
+   starts collapsed. The "Results" button expands it to 55 % of the map.
+   Selecting expands the drawer and shows details. "Back to results" stays visible while scrolling
+   and returns to the expanded list. Collapse the drawer to show only its toggle.
+   At 700 px the hours and pharmacy information form a centered block. The back button and
+   chevron sit at the outer edges of the toolbar. At phone widths the schedule is below the
+   pharmacy information. Attribution moves to the top right. Then stop the dev server.
 
 ## Data commands
 
@@ -134,8 +189,12 @@ clarity, as in `test(locale): cover English fallback`.
 
 ## Limitations
 
-- The page shows one illustrative distance only. It does not list pharmacies yet, and maps and
-  search start in later tasks.
+- The origin is always the default. City and address search, device location, pin drop and their
+  notices come next in task 6.
+- The hours view describes an ordinary week: public holiday (`PH`) rules are ignored, and values
+  with months, weeks, dates, comments or `||` (10 of 623 in the snapshot) are shown as raw text.
+- Pins near the station overlap at the initial zoom; clicks hit only the visible pin shape, and
+  every pin is also reachable with Tab and Enter.
 - Dependency and Playwright browser downloads require network access. The UI suite starts a local
   server on port 4317. If the agent sandbox blocks network access or that listener, run the affected
   command outside the sandbox with approval.

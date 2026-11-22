@@ -1,6 +1,20 @@
 {
   "title": "Lähiapteekit",
-  "heading": "Lähiapteekit",
-  "sampleCaption": "Esimerkkietäisyys",
-  "straightLine": "{distance} linnuntietä"
+  "originCaption": "Lähtöpiste",
+  "defaultOrigin": "Helsingin päärautatieasema (oletus)",
+  "results": "Tulokset",
+  "resultsTitle": "Lähimmät apteekit",
+  "scopeAndCount": "Kartoitetut apteekit Suomessa · {count}",
+  "straightLine": "{distance} linnuntietä",
+  "addressUnavailable": "Osoite ei saatavilla",
+  "unnamedPharmacy": "Nimetön apteekki",
+  "hoursHeading": "Aukioloajat",
+  "hoursUnavailable": "Aukioloajat eivät saatavilla",
+  "closed": "Suljettu",
+  "days": "ma ti ke to pe la su",
+  "backToResults": "Takaisin tuloksiin",
+  "closeDetails": "Sulje tiedot",
+  "detailsLabel": "Apteekin tiedot",
+  "mapAttribution": "© OpenStreetMap contributors",
+  "mapLabel": "Apteekkikartta"
 }

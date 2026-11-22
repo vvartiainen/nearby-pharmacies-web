@@ -33,26 +33,30 @@ dark colours as separate `color/dark/…` variables because its free plan allows
 
 ### Colour
 
-| Role                    | Web                              | iOS                    | Light     | Dark      |
-| ----------------------- | -------------------------------- | ---------------------- | --------- | --------- |
-| Page background         | `--color-page-background`        | `pageBackground`       | `#F2F4F6` | `#0D141B` |
-| Surface (rows, sheet)   | `--color-surface-default`        | `surfaceDefault`       | `#FFFFFF` | `#17212B` |
-| Border                  | `--color-border-subtle`          | `borderSubtle`         | `#DCE1E6` | `#2E3C49` |
-| Border, strong (inputs) | `--color-border-strong`          | `borderStrong`         | `#8895A1` | `#6B7A88` |
-| Text, primary           | `--color-text-primary`           | `textPrimary`          | `#14202B` | `#EEF2F5` |
-| Text, secondary         | `--color-text-secondary`         | `textSecondary`        | `#51606E` | `#A9B6C2` |
-| Accent (marker, pin)    | `--color-accent-default`         | `accentDefault`        | `#0B7A5A` | `#3FBF8F` |
-| Interactive, primary    | `--color-interactive-primary`    | `interactivePrimary`   | `#0B7A5A` | `#3FBF8F` |
-| On primary              | `--color-interactive-on-primary` | `interactiveOnPrimary` | `#FFFFFF` | `#0D141B` |
-| Pin, selected           | `--color-pin-selected`           | `pinSelected`          | `#06402F` | `#8FE3C1` |
-| Pin outline             | `--color-pin-outline`            | `pinOutline`           | `#FFFFFF` | `#0D141B` |
-| Origin marker           | `--color-origin-marker`          | `originMarker`         | `#1D5FBF` | `#5B9BFF` |
-| Selection surface       | `--color-selection-surface`      | `selectionSurface`     | `#E3F2EC` | `#163A2F` |
-| Selection border        | `--color-selection-border`       | `selectionBorder`      | `#06402F` | `#8FE3C1` |
-| Focus ring              | `--color-focus-ring`             | `focusRing`            | `#1D5FBF` | `#7FB0FF` |
-| Notice surface          | `--color-notice-surface`         | `noticeSurface`        | `#FFF4D6` | `#3A2E10` |
-| Notice border           | `--color-notice-border`          | `noticeBorder`         | `#E2C06E` | `#7A6230` |
-| Notice text             | `--color-notice-text`            | `noticeText`           | `#5C3D00` | `#F5D48A` |
+| Role                     | Web                              | iOS                    | Light     | Dark      |
+| ------------------------ | -------------------------------- | ---------------------- | --------- | --------- |
+| Page background          | `--color-page-background`        | `pageBackground`       | `#F2F4F6` | `#0D141B` |
+| Surface (rows, sheet)    | `--color-surface-default`        | `surfaceDefault`       | `#FFFFFF` | `#17212B` |
+| Border                   | `--color-border-subtle`          | `borderSubtle`         | `#DCE1E6` | `#2E3C49` |
+| Border, strong (inputs)  | `--color-border-strong`          | `borderStrong`         | `#8895A1` | `#6B7A88` |
+| Text, primary            | `--color-text-primary`           | `textPrimary`          | `#14202B` | `#EEF2F5` |
+| Text, secondary          | `--color-text-secondary`         | `textSecondary`        | `#51606E` | `#A9B6C2` |
+| Nearby distance (web)    | `--color-distance-near`          | —                      | `#166144` | `#8FE3B1` |
+| Mid-range distance (web) | `--color-distance-medium`        | —                      | `#785300` | `#F3CD76` |
+| Farther distance (web)   | `--color-distance-far`           | —                      | `#A82B38` | `#FF9DA0` |
+| Accent (marker, pin)     | `--color-accent-default`         | `accentDefault`        | `#0B7A5A` | `#3FBF8F` |
+| Interactive, primary     | `--color-interactive-primary`    | `interactivePrimary`   | `#0B7A5A` | `#3FBF8F` |
+| On primary               | `--color-interactive-on-primary` | `interactiveOnPrimary` | `#FFFFFF` | `#0D141B` |
+| Pin, selected            | `--color-pin-selected`           | `pinSelected`          | `#06402F` | `#8FE3C1` |
+| Muted pharmacy pin (web) | `--color-pin-muted`              | —                      | `#626B74` | `#89939D` |
+| Pin outline              | `--color-pin-outline`            | `pinOutline`           | `#FFFFFF` | `#0D141B` |
+| Origin marker            | `--color-origin-marker`          | `originMarker`         | `#1D5FBF` | `#5B9BFF` |
+| Selection surface        | `--color-selection-surface`      | `selectionSurface`     | `#E3F2EC` | `#163A2F` |
+| Selection border         | `--color-selection-border`       | `selectionBorder`      | `#06402F` | `#8FE3C1` |
+| Focus ring               | `--color-focus-ring`             | `focusRing`            | `#1D5FBF` | `#7FB0FF` |
+| Notice surface           | `--color-notice-surface`         | `noticeSurface`        | `#FFF4D6` | `#3A2E10` |
+| Notice border            | `--color-notice-border`          | `noticeBorder`         | `#E2C06E` | `#7A6230` |
+| Notice text              | `--color-notice-text`            | `noticeText`           | `#5C3D00` | `#F5D48A` |
 
 Dark values for page background, border strong, on primary, pin selected and outline, origin marker,
 focus ring and notice are †. Measured contrast: secondary text 6.5:1 light and 7.9:1 dark on
@@ -108,17 +112,20 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 ### Pharmacy pin and origin marker
 
-- Pin: teardrop with a white cross, accent fill. Selected: about 1.5 times larger, darker fill,
-  extra outline, drawn above other pins. Each pin is a button labelled with the pharmacy name and
-  distance.
+- Pin: teardrop with an on-primary cross (white in light mode, dark in dark mode), accent fill.
+  Selected: about 1.5 times larger, stronger green fill, and an extra outline. On web, the selected
+  pin draws above the other markers, and the other pharmacy pins turn gray while a selection is
+  active. Each pin is a button labelled with the pharmacy name and distance.
 - Origin marker: a blue dot with a halo, never a teardrop, so it cannot be mistaken for a pharmacy.
   It always has a visible label nearby or in the origin search.
 
 ### Pharmacy result row
 
-- Marker column 18 wide, then the name (row name style, wraps) and the distance (row distance
-  style). Padding 12 vertical and 16 horizontal, gap 12, radius 12, subtle border.
-- Selected: ring-and-dot marker, 2 px selection border, selection surface fill. Text does not move.
+- The name wraps. Web places the distance at the right edge of the row and shows the value and unit
+  alone. The displayed distance is green below 500 m, amber from 500 m to under 1 km, and red
+  from 1 km upward. On iOS the distance is below the name. Rows have a subtle border and radius 12. Desktop padding is 12 px vertical and 16 px horizontal. Narrow web uses 4 px vertical and
+  8 px horizontal with a 44 px minimum row height and 4 px between rows.
+- Selected: 2 px selection border, selection surface fill. Text does not move.
 - The whole row is one button. Its accessible name is "{name}, {distance}", and it exposes the
   selected state (`aria-pressed` or `aria-current` on web, `.isSelected` trait on iOS).
 - Unnamed features use "Unnamed pharmacy".
@@ -127,52 +134,75 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 - Heading "Opening hours", then one line per day, Monday first, with the day in body strong and the
   time ranges in body. Closed days say "Closed".
+- Times follow the interface language: English "07:30–18:00", Finnish "7.30–18.00" (period
+  separator, no leading zero). Ranges are joined with an en dash.
 - When `opening_hours` is missing: a notice box "Hours unavailable". When present but not
   interpretable by the app: show the raw text under the heading.
 - No "open now" badge in this release.
 
 ### Results sheet and list
 
-- Header: title "Nearest pharmacies", the origin label, and the scope "Mapped pharmacies in Finland"
-  with the result count.
-- Rows in distance order. Selecting a row shows its details: name, distance, address (or "Address
-  unavailable") and the hours block, with a back control to the list on narrow layouts.
+- Desktop web and iOS show the title "Nearest pharmacies" and the scope "Mapped pharmacies in
+  Finland" with the result count. The narrow web drawer uses a "Results" toggle.
+- Rows in distance order. Selecting a row or a pin selects both and shows its details: name,
+  distance, address (or "Address unavailable") and the hours block.
+- Desktop web: the list always stays in the panel. The details open in a card docked over the map's
+  top-left corner, next to the panel: about 320 wide, inset spacing-lg from the map edges, surface
+  background, radius-lg and a shadow. It never grows past the map (the inset stays at the bottom
+  too); its content scrolls inside it. The card is a labelled region "Pharmacy details", not a
+  modal: no backdrop, no focus trap. A close button "Close details" (44 hit target), or Escape while
+  focus is in the card, closes it and returns focus to the selected row; the pharmacy stays
+  selected. Selecting another pharmacy updates the open card in place. Opening it from a row moves
+  focus to the name; opening it from a pin keeps focus on the pin. Selecting from the list or map
+  fits the starting point and the selected pin to the right of the card and draws a dashed
+  blue straight line with a white outline between them. The zoom control sits at the top right, clear of the card.
+- Narrow web: the collapsed drawer shows only a toggle that reopens its current view. Selecting
+  a row or pin expands it to 55 % of the map area, shows details, and fits both markers and the line
+  above the drawer.
+  "Back to results" stays above the scrolling content and reopens the expanded list with focus on
+  the selected row. The toolbar spans the drawer. In expanded details, it places the back button
+  on the left and the drawer toggle on the right. The list shares a side gutter with the origin
+  header. Pharmacy details are centered in a block capped at 28rem with at least 1rem of side
+  padding. The block is vertically centered below the toolbar when it fits and scrolls from the
+  top when taller. Opening hours sit beside the name, distance and address when the drawer
+  content is at least 33rem wide. At smaller widths, the two sections stack and share a left edge
+  in a block sized to its content. A 16 px gap separates the sections whenever they stack.
 - Notices (location, search, border, outside Finland) appear at the top of the list, above the rows.
 
 ## Layouts
 
 | Layout      | Width         | Structure                                                                                                                                                                |
 | ----------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Desktop web | 900 px and up | Left panel 400 wide: origin search, notices, list or details. Map fills the rest. Attribution bottom right.                                                              |
-| Narrow web  | below 900 px  | Origin search on top, map below, results sheet over the map with peek (header plus first row) and expanded states. Smallest checked width 320.                           |
+| Desktop web | 900 px and up | Left panel 400 wide: origin search, notices and list. Map fills the rest, with the details card over its top-left corner. Attribution bottom right.                      |
+| Narrow web  | below 900 px  | Origin search on top, map below, results sheet over the map: collapsed to controls, expanded to 55 % of the map area. Smallest checked width 320.                        |
 | iPhone      | all sizes     | Full-screen MapKit map. Sheet with detents: small (header plus nearest row), medium, large. Search field at the top of the sheet. Smallest checked: iPhone SE 375 × 667. |
 
 - The first launch shows the default origin and its results before any prompt.
-- On narrow web and iPhone, selecting a pin raises the sheet to show the row or details.
+- The iPhone sheet keeps its detent when a pharmacy is selected. Content scrolls within the sheet.
 - At the largest text sizes (iOS accessibility sizes, 200 % browser text) a long name such as
-  "Vaara-Karjalan apteekki (Heinävaaran palvelupiste)" wraps over several lines, the distance stays
-  below it, and the iPhone sheet opens at the medium detent so at least one full row is visible.
+  "Vaara-Karjalan apteekki (Heinävaaran palvelupiste)" wraps over several lines. The iPhone sheet
+  opens at the medium detent so at least one full row is visible.
 
 ## States and interactions
 
-| Event                                                           | Origin                                                          | Results                       | Selection     | Map                                                      | Message                                                                      |
-| --------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------- | ------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| First launch                                                    | Default: Helsinki Central Railway Station                       | Ranked from default           | None          | Fits origin and nearest results                          | Location prompt after the results show                                       |
-| Location granted, default origin still active                   | Your location                                                   | Reranked                      | Cleared       | Recentres on the fix                                     | None                                                                         |
-| Location granted after the user chose an origin                 | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                | None. "Use my location" can apply it later                                   |
-| Location denied or timed out                                    | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                | "Location unavailable…" notice with search and map hints                     |
-| Search submitted                                                | Unchanged until a match is chosen                               | Unchanged                     | Unchanged     | Unchanged                                                | Busy state on the button                                                     |
-| Match chosen                                                    | The match, with its label                                       | Reranked                      | Cleared       | Fits origin and nearest results                          | None                                                                         |
-| No matches                                                      | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                | "No places in Finland match…" under the field                                |
-| Geocoder failed or rate-limited                                 | Unchanged; a city query may still match the bundled place index | Unchanged                     | Unchanged     | Unchanged                                                | "Address search is unavailable…"                                             |
-| Pin dropped (long press, or right click and "Search from here") | Dropped pin                                                     | Reranked                      | Cleared       | Keeps the viewport                                       | None                                                                         |
-| Late geocoder response after a pin drop                         | Stays on the dropped pin                                        | Unchanged                     | Unchanged     | Unchanged                                                | Response ignored                                                             |
-| Map panned or zoomed                                            | Unchanged                                                       | Unchanged                     | Unchanged     | Moves                                                    | "Search from here" button appears; pressing it drops a pin at the map centre |
-| Row selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy | Pans only if its pin is off screen; pin becomes selected | Details shown                                                                |
-| Pin selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy | Unchanged                                                | Row selected and scrolled into view; details shown                           |
-| Origin outside Finland                                          | The chosen origin stays                                         | Nearest pharmacies in Finland | Cleared       | Fits origin and nearest results                          | "This starting point is outside Finland…" with "Return to Helsinki"          |
-| Origin within about 5 km of a land border                       | As chosen                                                       | As ranked                     | As before     | As before                                                | "Pharmacies across the border…" notice                                       |
-| Tiles fail to load                                              | Unchanged                                                       | Unchanged                     | Unchanged     | Blank map, pins still drawn on web                       | List and search keep working                                                 |
+| Event                                                           | Origin                                                          | Results                       | Selection     | Map                                                                         | Message                                                                      |
+| --------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------- | ------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| First launch                                                    | Default: Helsinki Central Railway Station                       | Ranked from default           | None          | Fits origin and nearest results                                             | Location prompt after the results show                                       |
+| Location granted, default origin still active                   | Your location                                                   | Reranked                      | Cleared       | Recentres on the fix                                                        | None                                                                         |
+| Location granted after the user chose an origin                 | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                   | None. "Use my location" can apply it later                                   |
+| Location denied or timed out                                    | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                   | "Location unavailable…" notice with search and map hints                     |
+| Search submitted                                                | Unchanged until a match is chosen                               | Unchanged                     | Unchanged     | Unchanged                                                                   | Busy state on the button                                                     |
+| Match chosen                                                    | The match, with its label                                       | Reranked                      | Cleared       | Fits origin and nearest results                                             | None                                                                         |
+| No matches                                                      | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                   | "No places in Finland match…" under the field                                |
+| Geocoder failed or rate-limited                                 | Unchanged; a city query may still match the bundled place index | Unchanged                     | Unchanged     | Unchanged                                                                   | "Address search is unavailable…"                                             |
+| Pin dropped (long press, or right click and "Search from here") | Dropped pin                                                     | Reranked                      | Cleared       | Keeps the viewport                                                          | None                                                                         |
+| Late geocoder response after a pin drop                         | Stays on the dropped pin                                        | Unchanged                     | Unchanged     | Unchanged                                                                   | Response ignored                                                             |
+| Map panned or zoomed                                            | Unchanged                                                       | Unchanged                     | Unchanged     | Moves                                                                       | "Search from here" button appears; pressing it drops a pin at the map centre |
+| Row selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy | Web fits the origin and selected pin and connects them with a straight line | Details shown; the narrow web drawer expands                                 |
+| Pin selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy | Web fits the origin and selected pin and connects them with a straight line | Details shown; the narrow web drawer expands                                 |
+| Origin outside Finland                                          | The chosen origin stays                                         | Nearest pharmacies in Finland | Cleared       | Fits origin and nearest results                                             | "This starting point is outside Finland…" with "Return to Helsinki"          |
+| Origin within about 5 km of a land border                       | As chosen                                                       | As ranked                     | As before     | As before                                                                   | "Pharmacies across the border…" notice                                       |
+| Tiles fail to load                                              | Unchanged                                                       | Unchanged                     | Unchanged     | Blank map, pins still drawn on web                                          | List and search keep working                                                 |
 
 ## Interface text
 
@@ -200,6 +230,7 @@ never translated. Strings with `{…}` take values.
 | Location prompt dismiss | Not now                                                                                          | Ei nyt                                                                                                 |
 | Location unavailable    | Location unavailable. Search for a city or address, or choose a point on the map.                | Sijainti ei ole käytettävissä. Hae kaupunkia tai osoitetta tai valitse kohta kartalta.                 |
 | Results title           | Nearest pharmacies                                                                               | Lähimmät apteekit                                                                                      |
+| Results toggle (web)    | Results                                                                                          | Tulokset                                                                                               |
 | Scope and count         | Mapped pharmacies in Finland · {count}                                                           | Kartoitetut apteekit Suomessa · {count}                                                                |
 | Distance                | {distance} straight line                                                                         | {distance} linnuntietä                                                                                 |
 | Address unavailable     | Address unavailable                                                                              | Osoite ei saatavilla                                                                                   |
@@ -209,9 +240,12 @@ never translated. Strings with `{…}` take values.
 | Closed                  | Closed                                                                                           | Suljettu                                                                                               |
 | Days                    | Mon Tue Wed Thu Fri Sat Sun                                                                      | ma ti ke to pe la su                                                                                   |
 | Back to list            | Back to results                                                                                  | Takaisin tuloksiin                                                                                     |
+| Close details           | Close details                                                                                    | Sulje tiedot                                                                                           |
+| Details label           | Pharmacy details                                                                                 | Apteekin tiedot                                                                                        |
 | Outside Finland         | This starting point is outside Finland. Only pharmacies in Finland are shown.                    | Lähtöpiste on Suomen ulkopuolella. Näytetään vain Suomen apteekit.                                     |
 | Return to Helsinki      | Return to Helsinki                                                                               | Palaa Helsinkiin                                                                                       |
 | Border notice           | Pharmacies across the border may be nearer but are not shown.                                    | Rajan takana voi olla lähempiä apteekkeja, joita ei näytetä.                                           |
+| Map label               | Map of pharmacies                                                                                | Apteekkikartta                                                                                         |
 | Map attribution         | © OpenStreetMap contributors                                                                     | © OpenStreetMap contributors                                                                           |
 
 ## Distance format

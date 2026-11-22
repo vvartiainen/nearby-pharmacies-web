@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDistance, formatStraightLine } from "./distance";
+import { distanceBand, formatDistance, formatStraightLine } from "./distance";
 
 // Intl may separate number and unit with a no-break space; normalise it for readable expectations.
 const normalize = (text: string) => text.replace(/[  ]/g, " ");
@@ -35,5 +35,16 @@ describe("formatStraightLine", () => {
   it("uses the localized straight-line message", () => {
     expect(normalize(formatStraightLine(1700, "en"))).toBe("1.7 km straight line");
     expect(normalize(formatStraightLine(1700, "fi"))).toBe("1,7 km linnuntietä");
+  });
+});
+
+describe("distanceBand", () => {
+  it.each([
+    { meters: 494.9, band: "near" },
+    { meters: 495, band: "medium" },
+    { meters: 994.9, band: "medium" },
+    { meters: 995, band: "far" },
+  ])("uses the displayed distance to color $meters m as $band", ({ meters, band }) => {
+    expect(distanceBand(meters)).toBe(band);
   });
 });

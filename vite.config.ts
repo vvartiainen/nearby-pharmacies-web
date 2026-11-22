@@ -5,6 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: { host: "127.0.0.1", port: 5173, strictPort: true },
   preview: { host: "127.0.0.1", port: 4173, strictPort: true },
+  // The single bundle holds the pharmacy snapshot (about 230 kB of JSON) and Leaflet.
+  build: { chunkSizeWarningLimit: 700 },
   test: {
     include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
     environment: "node",
