@@ -1,4 +1,4 @@
-// Copies the bundled data and the shared ranking fixture into the iOS repository, or verifies that
+// Copies the bundled data, the coverage geometry and the shared ranking fixture into the iOS repository, or verifies that
 // the copies there are identical.
 //
 //   pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios
@@ -46,6 +46,11 @@ export function syncPlan(webRoot: string, iosRepo: string, region: string, dataD
     plan.push({ source, target: join(iosRepo, IOS_DATA_DIR, entry.path) });
   }
   plan.push({ source: manifestPath, target: join(iosRepo, IOS_DATA_DIR, names.manifest) });
+  // The coverage geometry is not in the manifest: only boundary-filtered PBF imports write it.
+  const coveragePath = join(webRoot, dataDir, names.coverage);
+  if (existsSync(coveragePath)) {
+    plan.push({ source: coveragePath, target: join(iosRepo, IOS_DATA_DIR, names.coverage) });
+  }
   plan.push({
     source: join(webRoot, RANKING_FIXTURE),
     target: join(iosRepo, IOS_FIXTURE_DIR, "ranking-v1.json"),

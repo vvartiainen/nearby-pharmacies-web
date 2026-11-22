@@ -7,16 +7,16 @@ duplicates) and [ADR 0002](../adr/0002-geocoder-and-web-tiles.md) (place index).
 
 ## Files
 
-| File                          | Content                                                                                   |
-| ----------------------------- | ----------------------------------------------------------------------------------------- |
-| `src/data/pharmacies.fi.json` | Pharmacy snapshot: `{"schemaVersion":1,"region":"fi","pharmacies":[...]}`                 |
-| `src/data/places.fi.json`     | Place index (PBF import only): `{"schemaVersion":1,"region":"fi","places":[...]}`         |
-| `src/data/coverage.fi.json`   | Simplified national boundary and land border for web notices (boundary-filtered PBF only) |
-| `src/data/manifest.fi.json`   | Source, checksums, counts, dropped duplicates and review list                             |
-| `src/data/ODbL-NOTICE.txt`    | Licence notice to ship with the data                                                      |
-| `src/data/schema.ts`          | TypeScript types for the files above                                                      |
-| `src/data/index.ts`           | Typed import of the snapshot and manifest for the app                                     |
-| `fixtures/ranking/`           | Shared ranking fixture and the independent Python check                                   |
+| File                          | Content                                                                                        |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| `src/data/pharmacies.fi.json` | Pharmacy snapshot: `{"schemaVersion":1,"region":"fi","pharmacies":[...]}`                      |
+| `src/data/places.fi.json`     | Place index (PBF import only): `{"schemaVersion":1,"region":"fi","places":[...]}`              |
+| `src/data/coverage.fi.json`   | Simplified national boundary and land border for coverage notices (boundary-filtered PBF only) |
+| `src/data/manifest.fi.json`   | Source, checksums, counts, dropped duplicates and review list                                  |
+| `src/data/ODbL-NOTICE.txt`    | Licence notice to ship with the data                                                           |
+| `src/data/schema.ts`          | TypeScript types for the files above                                                           |
+| `src/data/index.ts`           | Typed import of the snapshot and manifest for the app                                          |
+| `fixtures/ranking/`           | Shared ranking fixture and the independent Python check                                        |
 
 The JSON data files are generated. Do not edit them by hand. They are excluded from Oxfmt and from
 `pnpm run style`.
@@ -83,7 +83,7 @@ the `boundary=administrative`, `admin_level=2` relation with `ISO3166-1` equal t
 Geofabrik cuts its extracts with a buffer, so the Finland file also contains Swedish pharmacies in
 Haparanda. Filtering on the extract alone would show them as Finnish results. If the boundary is
 missing, the import fails. Excluded IDs are listed in the manifest's `outsideRegion`. The same
-import generates the web-only coverage file with closed boundary rings and non-maritime border
+import generates the coverage file with closed boundary rings and non-maritime border
 segments. It simplifies their geometry to a tolerance of 0.001° and writes coordinates with
 five decimals. Ranking still uses the pharmacy coordinates and the importer filters against the
 full boundary.
@@ -102,7 +102,7 @@ The same input file produces byte-identical output. The importer writes no wall-
 manifest's `generatedAt` is `SOURCE_DATE_EPOCH` when that is set. Otherwise it is the source data
 timestamp: the PBF header's `osmosis_replication_timestamp`, or the Overpass `timestamp_osm_base`.
 The manifest records the source file's name, size and SHA-256, and the SHA-256 of each shared
-output file. The web-only coverage file is derived from that same extract. Bump
+output file. The coverage file is derived from that same extract. Bump
 `IMPORTER_VERSION` in `scripts/data/output.ts` whenever a shared output changes for the same input.
 
 ## Current snapshot
@@ -111,7 +111,7 @@ The checked-in data is a PBF import of Geofabrik's `finland-latest.osm.pbf` (OSM
 2026-11-21T21:20:51Z, replication sequence 4978): 784 pharmacies after dropping 2 unnamed
 duplicates and 2 features outside Finland, and 4,675 places. The manifest has `"kind": "osm-pbf"`.
 An Overpass response can still produce an interim snapshot (`--overpass`, `"kind":
-"overpass-interim"`) without interior pins, a place index, or web coverage geometry. Refresh the data with:
+"overpass-interim"`) without interior pins, a place index, or coverage geometry. Refresh the data with:
 
 ```sh
 curl -L -o /tmp/finland-latest.osm.pbf https://download.geofabrik.de/europe/finland-latest.osm.pbf  # about 742 MB

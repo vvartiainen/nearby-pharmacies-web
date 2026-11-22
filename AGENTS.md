@@ -160,7 +160,7 @@ or 26. Formats, reproducibility and licence are described in
 | -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Import a PBF extract                   | `pnpm run data:import -- --input <file.osm.pbf> --region fi`     | `data:import: wrote N pharmacies and M places to src/data/ (osm-pbf, ...)`     |
 | Interim import from an Overpass answer | `pnpm run data:import -- --overpass <overpass.json> --region fi` | `data:import: wrote N pharmacies to src/data/ (overpass-interim, ...)`         |
-| Copy data and fixture to the iOS repo  | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
+| Copy data, coverage and fixture to iOS | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
 | Check the iOS copies                   | `pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios`    | `data:verify: N file(s) match`, exit 0; `missing:`/`differs:` lines and exit 1 |
 | Re-check the fixture in Python         | `pnpm run data:check-fixture`                                    | `fixture OK: 3 origins, 19 display cases`                                      |
 

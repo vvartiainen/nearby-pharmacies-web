@@ -11,6 +11,7 @@ export const dataFileNames = (region: string) => ({
   pharmacies: `pharmacies.${region}.json`,
   places: `places.${region}.json`,
   manifest: `manifest.${region}.json`,
+  coverage: `coverage.${region}.json`,
   notice: "ODbL-NOTICE.txt",
 });
 

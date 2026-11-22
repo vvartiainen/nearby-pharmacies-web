@@ -52,6 +52,14 @@ describe("iOS sync and verify", () => {
     expect(runCli("verify", args, web)).toBe(0);
   });
 
+  it("copies the coverage geometry when the import wrote one", () => {
+    const coverage = '{"rings":[],"landBorders":[]}';
+    writeFileSync(join(web, "src/data", names.coverage), coverage);
+    expect(runCli("verify", args, web)).toBe(1);
+    expect(runCli("sync", args, web)).toBe(0);
+    expect(readFileSync(join(ios, IOS_DATA_DIR, names.coverage), "utf8")).toBe(coverage);
+  });
+
   it("exits non-zero when an iOS copy differs", () => {
     writeFileSync(join(ios, IOS_DATA_DIR, names.pharmacies), snapshot.replace("[", "[ "));
     expect(runCli("verify", args, web)).toBe(1);
