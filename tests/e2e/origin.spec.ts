@@ -272,6 +272,8 @@ test("a map pick wins over a pending geocoder response", async ({ page }) => {
       finished.resolve();
     }
   });
+  // Without the address index, the chosen point keeps its plain label.
+  await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await page.goto("/");
   try {
     await submitSearch(page, "Kauppakatu 1");
@@ -289,6 +291,7 @@ test("a map pick wins over a pending geocoder response", async ({ page }) => {
 });
 
 test("a map pick also wins over a late device fix", async ({ page }) => {
+  await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await mockLocation(page, [tampere], true);
   await page.goto("/");
   const locate = page.getByRole("button", { name: "Use my location" });
@@ -362,7 +365,10 @@ test("a pending address lookup cannot relabel a newer starting point", async ({ 
   const started = latch();
   const releaseAddress = latch();
   const finished = latch();
+  let requests = 0;
   await page.route("**/address-index/index.json", async (route) => {
+    // Only the device lookup is held; the chosen point's own lookup finds no index.
+    if (++requests > 1) return route.fulfill({ status: 503 });
     started.resolve();
     await releaseAddress.promise;
     try {
@@ -385,6 +391,21 @@ test("a pending address lookup cannot relabel a newer starting point", async ({ 
   }
   await finished.promise;
   await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
+});
+
+test("a point chosen on the map shows a nearby street address", async ({ page }) => {
+  await page.goto("/");
+  // Selecting the nearest pharmacy zooms the map in on Elielinaukio, so the centre is next to
+  // street addresses.
+  await ensureResultsOpen(page);
+  await row(page, "Steissin Apteekki").click();
+  await page.getByRole("button", { name: "Choose on map" }).click();
+  await page.getByRole("button", { name: "Search from here" }).click();
+  const origin = page.getByTestId("origin");
+  await expect(origin).toHaveValue(/^Near .+, Helsinki$/);
+  await expect(page.locator(".origin-search__title")).toHaveText(/^Near \S.* \d/);
+  await expect(page.locator(".origin-search__locality")).toHaveText("Helsinki");
+  await expect(page.locator(".origin-marker")).toHaveAccessibleName("Dropped pin");
 });
 
 test("shows Finnish results near and across the border and can return to Helsinki", async ({

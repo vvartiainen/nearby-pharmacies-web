@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Origin } from "../app/state";
 import type { SupportedLocale } from "../i18n/locale";
-import { findDeviceAddress, type DeviceAddress } from "./deviceAddress";
+import type { LatLon } from "../ranking/haversine";
+import { findNearbyAddress, type NearbyAddress } from "./nearbyAddress";
 import { createGeocoder, loadGeocoderConfig, type PlaceMatch } from "./geocoder";
 import { loadLocalPlaces, searchLocalPlaces } from "./localPlaces";
 
@@ -29,7 +30,7 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     useState<Awaited<ReturnType<typeof loadGeocoderConfig>>["provider"]>();
   const [search, setSearch] = useState<SearchState>({ kind: "idle" });
   const [location, setLocation] = useState<LocationState>("idle");
-  const [deviceAddress, setDeviceAddress] = useState<DeviceAddress>();
+  const [originAddress, setOriginAddress] = useState<NearbyAddress>();
   const [offerLocation, setOfferLocation] = useState(shouldOfferLocation);
   const searchRequest = useRef<AbortController | null>(null);
   const locationRequest = useRef<object | null>(null);
@@ -70,7 +71,7 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
       addressRequest.current?.abort();
       addressRequest.current = null;
       locationRequest.current = null;
-      setDeviceAddress(undefined);
+      setOriginAddress(undefined);
       setLocation("idle");
       dismissLocationOffer();
       applyOrigin(origin);
@@ -112,6 +113,30 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     }
   }
 
+  /** Labels a device fix or a chosen point with a nearby street address, when one is found. */
+  function lookUpAddress(point: Origin & { kind: "device" | "pin" }, accuracy: number) {
+    const addressLookup = new AbortController();
+    addressRequest.current = addressLookup;
+    void findNearbyAddress(point, accuracy, addressLookup.signal)
+      .then((address) => {
+        if (addressRequest.current === addressLookup && !addressLookup.signal.aborted) {
+          setOriginAddress(address);
+        }
+      })
+      .catch(() => {
+        // The point remains usable if the optional address index is unavailable.
+      })
+      .finally(() => {
+        if (addressRequest.current === addressLookup) addressRequest.current = null;
+      });
+  }
+
+  function placePin(point: LatLon) {
+    const origin = { ...point, kind: "pin" } as const;
+    changeOrigin(origin);
+    lookUpAddress(origin, 0);
+  }
+
   function requestLocation() {
     if (locationRequest.current) return;
     dismissLocationOffer();
@@ -127,20 +152,7 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
         if (locationRequest.current !== request) return;
         const origin = { kind: "device", lat: coords.latitude, lon: coords.longitude } as const;
         changeOrigin(origin);
-        const addressLookup = new AbortController();
-        addressRequest.current = addressLookup;
-        void findDeviceAddress(origin, coords.accuracy, addressLookup.signal)
-          .then((address) => {
-            if (addressRequest.current === addressLookup && !addressLookup.signal.aborted) {
-              setDeviceAddress(address);
-            }
-          })
-          .catch(() => {
-            // The GPS fix remains usable if the optional address index is unavailable.
-          })
-          .finally(() => {
-            if (addressRequest.current === addressLookup) addressRequest.current = null;
-          });
+        lookUpAddress(origin, coords.accuracy);
       },
       (error) => {
         if (locationRequest.current !== request) return;
@@ -155,12 +167,13 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     provider,
     search,
     location,
-    deviceAddress,
+    originAddress,
     offerLocation,
     dismissLocationOffer,
     requestLocation,
     submitSearch,
     cancelSearch,
     changeOrigin,
+    placePin,
   };
 }

@@ -44,5 +44,5 @@
   "returnToHelsinki": "Return to Helsinki",
   "borderNotice": "Pharmacies across the border may be nearer but are not shown.",
   "searchPrivacyPublicPlaces": "Enter a public place or address.",
-  "nearDeviceAddress": "Near {address}"
+  "nearAddress": "Near {address}"
 }

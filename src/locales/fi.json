@@ -44,5 +44,5 @@
   "returnToHelsinki": "Palaa Helsinkiin",
   "borderNotice": "Rajan takana voi olla lähempiä apteekkeja, joita ei näytetä.",
   "searchPrivacyPublicPlaces": "Syötä julkinen paikka tai osoite.",
-  "nearDeviceAddress": "Lähellä: {address}"
+  "nearAddress": "Lähellä: {address}"
 }

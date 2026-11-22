@@ -92,8 +92,9 @@ neighborhood, municipality, and country where available. Arrow keys highlight a 
 chooses it, and Escape closes the dropdown.
 
 Device location starts on user action and needs HTTPS or localhost. The app ranks from the GPS
-fix immediately and looks for a nearby address using the bundled OSM index. It requests only the
-relevant regional files from the app host. An unavailable address leaves “Your location” in the
+fix immediately and looks for a nearby address using the bundled OSM index; a point chosen on the
+map gets the same lookup. It requests only the relevant regional files from the app host. An
+unavailable address leaves “Your location” or “Dropped pin” in the
 field. Panning or zooming only moves the map. “Choose on map” starts the picker: a target at the centre
 of the visible map follows panning, and “Search from here” or “Cancel” (or Escape) ends it.
 Right-click or long-press to put the target at a point directly. The button moves focus to the
@@ -159,13 +160,13 @@ The data scripts run TypeScript directly with Node (type stripping), which needs
 or 26. Formats, reproducibility and licence are described in
 [`docs/data/README.md`](docs/data/README.md).
 
-| Purpose                                | Command                                                          | Expected result                                                                |
-| -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Import a PBF extract                   | `pnpm run data:import -- --input <file.osm.pbf> --region fi`     | `data:import: wrote N pharmacies and M places to src/data/ (osm-pbf, ...)`     |
-| Interim import from an Overpass answer | `pnpm run data:import -- --overpass <overpass.json> --region fi` | `data:import: wrote N pharmacies to src/data/ (overpass-interim, ...)`         |
-| Copy data, coverage and fixture to iOS | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
-| Check the iOS copies                   | `pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios`    | `data:verify: N file(s) match`, exit 0; `missing:`/`differs:` lines and exit 1 |
-| Re-check the fixture in Python         | `pnpm run data:check-fixture`                                    | `fixture OK: 3 origins, 19 display cases`                                      |
+| Purpose                                 | Command                                                          | Expected result                                                                |
+| --------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Import a PBF extract                    | `pnpm run data:import -- --input <file.osm.pbf> --region fi`     | `data:import: wrote N pharmacies and M places to src/data/ (osm-pbf, ...)`     |
+| Interim import from an Overpass answer  | `pnpm run data:import -- --overpass <overpass.json> --region fi` | `data:import: wrote N pharmacies to src/data/ (overpass-interim, ...)`         |
+| Copy data, addresses and fixture to iOS | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
+| Check the iOS copies                    | `pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios`    | `data:verify: N file(s) match`, exit 0; `missing:`/`differs:` lines and exit 1 |
+| Re-check the fixture in Python          | `pnpm run data:check-fixture`                                    | `fixture OK: 3 origins, 19 display cases`                                      |
 
 The checked-in data comes from the Geofabrik Finland extract with OSM data from
 2026-11-21T21:20:51Z: 784 pharmacies and 4,675 places. To refresh it, download the extract (about
@@ -177,8 +178,8 @@ pnpm run data:import -- --input /tmp/finland-latest.osm.pbf --region fi
 pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios
 ```
 
-The sync writes `NearbyPharmacies/Resources/Data/` and `NearbyPharmaciesTests/Fixtures/` in the
-iOS repo. Commit both repos together. Regenerate the fixture's expected values only on purpose:
+The sync writes `NearbyPharmacies/Resources/Data/`, `NearbyPharmacies/Resources/AddressIndex.bundle/`
+and `NearbyPharmaciesTests/Fixtures/` in the iOS repo. Commit both repos together. Regenerate the fixture's expected values only on purpose:
 `python3 -I fixtures/ranking/compute_expected.py --write`, then
 `pnpm run format ./fixtures/ranking/ranking-v1.json`.
 

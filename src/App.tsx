@@ -21,7 +21,6 @@ import { tileSettings } from "./map/config";
 import { PharmacyMap, type MapPin, type ObscuredEdges } from "./map/PharmacyMap";
 import { originCoverage } from "./origin/coverage";
 import { useOriginControls } from "./origin/useOriginControls";
-import type { LatLon } from "./ranking/haversine";
 
 /** Same breakpoint as the desktop layout in styles.css. */
 const desktopQuery = "(min-width: 900px)";
@@ -35,11 +34,6 @@ export function App({ locale }: { locale: SupportedLocale }) {
 
   const applyOrigin = useCallback((origin: Origin) => dispatch({ type: "setOrigin", origin }), []);
   const controls = useOriginControls(locale, applyOrigin);
-  const { changeOrigin } = controls;
-  const placePin = useCallback(
-    (point: LatLon) => changeOrigin({ ...point, kind: "pin" }),
-    [changeOrigin],
-  );
   const coverage = useMemo(() => originCoverage(state.origin), [state.origin]);
 
   // Results depend on the origin only; selection and panning never rerank.
@@ -98,15 +92,19 @@ export function App({ locale }: { locale: SupportedLocale }) {
         : state.origin.kind === "pin"
           ? messages.pinOrigin
           : messages.defaultOrigin;
-  const deviceAddress = state.origin.kind === "device" ? controls.deviceAddress : undefined;
-  const originFieldTitle = deviceAddress
-    ? interpolate(messages.nearDeviceAddress, { address: deviceAddress.street })
+  // A device fix or a chosen point shows a nearby street address once one is found.
+  const nearbyAddress =
+    state.origin.kind === "device" || state.origin.kind === "pin"
+      ? controls.originAddress
+      : undefined;
+  const originFieldTitle = nearbyAddress
+    ? interpolate(messages.nearAddress, { address: nearbyAddress.street })
     : state.origin.kind === "search"
       ? state.origin.title
       : originLabel;
   const originFieldContext =
-    deviceAddress?.city ?? (state.origin.kind === "search" ? state.origin.context : "");
-  const originFieldLabel = deviceAddress
+    nearbyAddress?.city ?? (state.origin.kind === "search" ? state.origin.context : "");
+  const originFieldLabel = nearbyAddress
     ? [originFieldTitle, originFieldContext].filter(Boolean).join(", ")
     : originLabel;
   const count = new Intl.NumberFormat(locale).format(pharmacySnapshot.pharmacies.length);
@@ -132,7 +130,7 @@ export function App({ locale }: { locale: SupportedLocale }) {
             <button
               type="button"
               className="origin-action"
-              onClick={() => changeOrigin(defaultOrigin)}
+              onClick={() => controls.changeOrigin(defaultOrigin)}
             >
               {messages.returnToHelsinki}
             </button>
@@ -232,7 +230,7 @@ export function App({ locale }: { locale: SupportedLocale }) {
           zoomPosition={isDesktop ? "topright" : "topleft"}
           obscured={obscured}
           onSelect={selectPin}
-          onPlaceOrigin={placePin}
+          onPlaceOrigin={controls.placePin}
           chooseOnMap={messages.chooseOnMap}
           searchFromHere={messages.searchFromHere}
           cancel={messages.cancelMapPick}

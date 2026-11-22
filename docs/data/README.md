@@ -40,13 +40,13 @@ an interior point of its outline. Cities, towns and villages come from `place=*`
 the name of the municipality boundary that contains it. Places mapped only as areas are not
 included.
 
-### Web address index
+### Address index
 
 `public/address-index/` contains 166 regional gzip shards derived from the same Finland OSM
 extract as the pharmacy snapshot. It holds address-tagged nodes and ways with a street or place
-name and house number. Way coordinates use the bounding-box centre. The browser loads only the
-shards near a usable device fix and displays the closest mapped address within 120 m. The GPS
-fix remains the input to pharmacy ranking. The files are generated and covered by the same
+name and house number. Way coordinates use the bounding-box centre. Both apps read only the
+shards near a usable device fix or a point chosen on the map and display the closest mapped
+address within 120 m. The point remains the input to pharmacy ranking. The files are generated and covered by the same
 ODbL attribution as the snapshot.
 
 Regenerate the address index from the repository root with:
@@ -55,8 +55,8 @@ Regenerate the address index from the repository root with:
 pnpm run data:addresses ../finland-latest.osm.pbf
 ```
 
-The command also accepts a second argument for an output directory. The index is web-only and
-does not enter the shared iOS snapshot manifest.
+The command also accepts a second argument for an output directory. The index is not in the
+snapshot manifest; `data:sync-ios` copies the whole folder to the iOS app.
 
 ## Importer
 
@@ -127,7 +127,8 @@ pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios
 
 The sync copies every file the manifest lists, plus the manifest itself, into
 `NearbyPharmacies/Resources/Data/` (the app target). It copies `fixtures/ranking/ranking-v1.json`
-to `NearbyPharmaciesTests/Fixtures/` (the unit-test target). Both folders sit inside Xcode
+to `NearbyPharmaciesTests/Fixtures/` (the unit-test target), and `public/address-index/` to
+`NearbyPharmacies/Resources/AddressIndex.bundle/`, which Xcode copies into the app as one folder. Both folders sit inside Xcode
 synchronized groups, so the files join their targets without project edits. File names are
 unique, because Xcode flattens resources into one bundle folder. The sync refuses to copy when the
 web files do not match their manifest. Verify exits 1 when any copy is missing or its SHA-256

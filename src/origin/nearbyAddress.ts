@@ -19,7 +19,7 @@ function nearbyCells(point: LatLon) {
   return cells;
 }
 
-export interface DeviceAddress {
+export interface NearbyAddress {
   readonly street: string;
   readonly city: string;
 }
@@ -30,7 +30,7 @@ function nearestAddress(point: LatLon, shards: readonly AddressShard[]) {
     (addressRadiusMeters / EARTH_MEAN_RADIUS_METERS) * (180 / Math.PI) * addressCoordinateScale;
   const originLatitude = point.lat * addressCoordinateScale;
   let closest = addressRadiusMeters;
-  let address: DeviceAddress | undefined;
+  let address: NearbyAddress | undefined;
 
   for (const shard of shards) {
     for (const [lat, lon, street, number, city] of shard.points) {
@@ -66,8 +66,12 @@ async function fetchShard(
   }
 }
 
-/** Requests fixed same-origin data files. The GPS coordinates are used only in the browser. */
-export async function findDeviceAddress(point: LatLon, accuracy: number, signal: AbortSignal) {
+/**
+ * The nearest street address within 120 m of a device fix or a point chosen on the map. Requests
+ * fixed same-origin data files, so the coordinates are used only in the browser. `accuracy` is
+ * the fix's uncertainty in metres, 0 for a chosen point.
+ */
+export async function findNearbyAddress(point: LatLon, accuracy: number, signal: AbortSignal) {
   if (
     !Number.isFinite(accuracy) ||
     accuracy > addressRadiusMeters ||
