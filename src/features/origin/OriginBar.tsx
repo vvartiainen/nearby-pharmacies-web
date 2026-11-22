@@ -21,19 +21,6 @@ export function OriginBar({
   originLabel,
   count,
 }: OriginBarProps) {
-  const nearbyAddress =
-    origin.kind === "device" || origin.kind === "pin" ? controls.originAddress : undefined;
-  const originFieldTitle = nearbyAddress
-    ? interpolate(messages.nearAddress, { address: nearbyAddress.street })
-    : origin.kind === "search"
-      ? origin.title
-      : originLabel;
-  const originFieldContext =
-    nearbyAddress?.city ?? (origin.kind === "search" ? origin.context : "");
-  const originFieldLabel = nearbyAddress
-    ? [originFieldTitle, originFieldContext].filter(Boolean).join(", ")
-    : originLabel;
-
   return (
     <header className="origin-bar">
       <div>
@@ -44,9 +31,9 @@ export function OriginBar({
         controls={controls}
         messages={messages}
         origin={origin}
-        originLabel={originFieldLabel}
-        originTitle={originFieldTitle}
-        originContext={originFieldContext}
+        originLabel={originLabel}
+        originTitle={origin.kind === "search" ? origin.title : originLabel}
+        originContext={origin.kind === "search" ? origin.context : ""}
       />
       {coverage === "outside" ? (
         <div className="origin-coverage">

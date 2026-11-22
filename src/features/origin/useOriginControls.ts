@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import type { Origin } from "./origin";
 import type { SupportedLocale } from "../../shared/i18n/locale";
 import type { LatLon } from "../../shared/geo/haversine";
-import { findNearbyAddress, type NearbyAddress } from "./nearbyAddress";
 import { createGeocoder, loadGeocoderConfig, type PlaceMatch } from "./geocoder";
 import { loadLocalPlaces, searchLocalPlaces } from "./localPlaces";
 
@@ -30,11 +29,9 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     useState<Awaited<ReturnType<typeof loadGeocoderConfig>>["provider"]>();
   const [search, setSearch] = useState<SearchState>({ kind: "idle" });
   const [location, setLocation] = useState<LocationState>("idle");
-  const [originAddress, setOriginAddress] = useState<NearbyAddress>();
   const [offerLocation, setOfferLocation] = useState(shouldOfferLocation);
   const searchRequest = useRef<AbortController | null>(null);
   const locationRequest = useRef<object | null>(null);
-  const addressRequest = useRef<AbortController | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -45,7 +42,6 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     return () => {
       active = false;
       searchRequest.current?.abort();
-      addressRequest.current?.abort();
       locationRequest.current = null;
     };
   }, []);
@@ -67,10 +63,7 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
 
   function changeOrigin(origin: Origin) {
     cancelSearch();
-    addressRequest.current?.abort();
-    addressRequest.current = null;
     locationRequest.current = null;
-    setOriginAddress(undefined);
     setLocation("idle");
     dismissLocationOffer();
     applyOrigin(origin);
@@ -110,27 +103,8 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     }
   }
 
-  function lookUpAddress(point: Origin & { kind: "device" | "pin" }, accuracy: number) {
-    const addressLookup = new AbortController();
-    addressRequest.current = addressLookup;
-    void findNearbyAddress(point, accuracy, addressLookup.signal)
-      .then((address) => {
-        if (addressRequest.current === addressLookup && !addressLookup.signal.aborted) {
-          setOriginAddress(address);
-        }
-      })
-      .catch(() => {
-        // The point remains usable if the optional address index is unavailable.
-      })
-      .finally(() => {
-        if (addressRequest.current === addressLookup) addressRequest.current = null;
-      });
-  }
-
   function placePin(point: LatLon) {
-    const origin = { ...point, kind: "pin" } as const;
-    changeOrigin(origin);
-    lookUpAddress(origin, 0);
+    changeOrigin({ ...point, kind: "pin" });
   }
 
   function requestLocation() {
@@ -146,9 +120,7 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         if (locationRequest.current !== request) return;
-        const origin = { kind: "device", lat: coords.latitude, lon: coords.longitude } as const;
-        changeOrigin(origin);
-        lookUpAddress(origin, coords.accuracy);
+        changeOrigin({ kind: "device", lat: coords.latitude, lon: coords.longitude });
       },
       (error) => {
         if (locationRequest.current !== request) return;
@@ -163,7 +135,6 @@ export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin:
     provider,
     search,
     location,
-    originAddress,
     offerLocation,
     dismissLocationOffer,
     requestLocation,

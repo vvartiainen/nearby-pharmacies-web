@@ -79,19 +79,6 @@ async function chooseMapPoint(page: Page) {
 test("shows Helsinki before consent and reranks for a granted Tampere location", async ({
   page,
 }, testInfo) => {
-  const releaseAddress = latch();
-  if (testInfo.project.name === "desktop-chromium") {
-    await page.route("**/address-index/122-23.json.gz", (route) =>
-      route.fulfill({
-        path: "public/address-index/122-23.json.gz",
-        contentType: "application/gzip",
-      }),
-    );
-  }
-  await page.route("**/address-index/index.json", async (route) => {
-    await releaseAddress.promise;
-    await route.continue();
-  });
   await mockLocation(page, [tampere]);
   await page.goto("/");
   await expect(page.getByTestId("origin")).toHaveValue(initialOrigin);
@@ -103,21 +90,15 @@ test("shows Helsinki before consent and reranks for a granted Tampere location",
   } else {
     await expect(firstResult(page)).toHaveText("Steissin Apteekki");
   }
-  try {
-    await page.getByRole("button", { name: "Use my location" }).click();
-    await expect(page.getByTestId("origin")).toHaveValue("Your location");
-    if (testInfo.project.name === "narrow-webkit") {
-      await expect(toggle).toHaveAttribute("aria-expanded", "false");
-      await expect(toggle).toHaveText(/^Nearest: Tullintorin apteekki · 250\sm$/);
-    } else {
-      await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
-    }
-  } finally {
-    releaseAddress.resolve();
+  await page.getByRole("button", { name: "Use my location" }).click();
+  await expect(page.getByTestId("origin")).toHaveValue("Your location");
+  await expect(page.locator(".origin-marker")).toHaveAccessibleName("Your location");
+  if (testInfo.project.name === "narrow-webkit") {
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(toggle).toHaveText(/^Nearest: Tullintorin apteekki · 250\sm$/);
+  } else {
+    await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
   }
-  await expect(page.getByTestId("origin")).toHaveValue("Near Rautatienkatu 25, Tampere");
-  await expect(page.locator(".origin-search__title")).toHaveText("Near Rautatienkatu 25");
-  await expect(page.locator(".origin-search__locality")).toHaveText("Tampere");
   await ensureResultsOpen(page);
   await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
   await row(page, "Tullintorin apteekki").click();
@@ -287,7 +268,6 @@ test("a map pick wins over a pending geocoder response", async ({ page }) => {
       finished.resolve();
     }
   });
-  await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await page.goto("/");
   try {
     await submitSearch(page, "Kauppakatu 1");
@@ -305,7 +285,6 @@ test("a map pick wins over a pending geocoder response", async ({ page }) => {
 });
 
 test("a map pick also wins over a late device fix", async ({ page }) => {
-  await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await mockLocation(page, [tampere], true);
   await page.goto("/");
   const locate = page.getByRole("button", { name: "Use my location" });
@@ -363,53 +342,10 @@ test("panning alone keeps the origin and choosing on the map can be cancelled", 
   await expect(page.getByTestId("origin")).toHaveValue(initialOrigin);
 });
 
-test("keeps the device location when a nearby address cannot be loaded", async ({ page }) => {
-  await page.route("**/address-index/index.json", (route) => route.fulfill({ status: 503 }));
-  await mockLocation(page, [tampere]);
-  await page.goto("/");
-  await page.getByRole("button", { name: "Use my location" }).click();
-  await ensureResultsOpen(page);
-  await expect(page.getByTestId("origin")).toHaveValue("Your location");
-  await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
-});
-
-test("a pending address lookup cannot relabel a newer starting point", async ({ page }) => {
-  const started = latch();
-  const releaseAddress = latch();
-  const finished = latch();
-  let requests = 0;
-  await page.route("**/address-index/index.json", async (route) => {
-    // Only the device lookup is held; the chosen point's own lookup finds no index.
-    if (++requests > 1) return route.fulfill({ status: 503 });
-    started.resolve();
-    await releaseAddress.promise;
-    try {
-      await route.continue();
-    } catch {
-      // The app aborted the address lookup when the origin changed.
-    } finally {
-      finished.resolve();
-    }
-  });
-  await mockLocation(page, [tampere]);
-  await page.goto("/");
-  try {
-    await page.getByRole("button", { name: "Use my location" }).click();
-    await started.promise;
-    await chooseMapPoint(page);
-    await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
-  } finally {
-    releaseAddress.resolve();
-  }
-  await finished.promise;
-  await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
-});
-
 test("narrow layout: a point chosen on the map opens the drawer and stays in view", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name === "desktop-chromium", "narrow layout only");
-  await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await page.goto("/");
   const toggle = resultsToggle(page);
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -429,21 +365,6 @@ test("narrow layout: a point chosen on the map opens the drawer and stays in vie
   const expandedTop = (await page.locator(".results").boundingBox())!.y;
   expect(marker.y + marker.height).toBeLessThan(expandedTop);
   expect(marker.y).toBeGreaterThan(mapBox.y);
-});
-
-test("a point chosen on the map shows a nearby street address", async ({ page }) => {
-  await page.goto("/");
-  // Selecting the nearest pharmacy zooms the map in on Elielinaukio, so the centre is next to
-  // street addresses.
-  await ensureResultsOpen(page);
-  await row(page, "Steissin Apteekki").click();
-  await page.getByRole("button", { name: "Choose on map" }).click();
-  await page.getByRole("button", { name: "Search from here" }).click();
-  const origin = page.getByTestId("origin");
-  await expect(origin).toHaveValue(/^Near .+, Helsinki$/);
-  await expect(page.locator(".origin-search__title")).toHaveText(/^Near \S.* \d/);
-  await expect(page.locator(".origin-search__locality")).toHaveText("Helsinki");
-  await expect(page.locator(".origin-marker")).toHaveAccessibleName("Dropped pin");
 });
 
 test("shows Finnish results near and across the border and can return to Helsinki", async ({

@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { dataFileNames, sha256 } from "./output.ts";
@@ -7,9 +7,6 @@ import { dataFileNames, sha256 } from "./output.ts";
 export const IOS_DATA_DIR = "NearbyPharmacies/Resources/Data";
 export const IOS_FIXTURE_DIR = "NearbyPharmaciesTests/Fixtures";
 export const RANKING_FIXTURE = "fixtures/ranking/ranking-v1.json";
-/** The web address index, and its iOS copy: a `.bundle` folder that the app copies whole. */
-export const ADDRESS_INDEX_DIR = "public/address-index";
-export const IOS_ADDRESS_INDEX_DIR = "NearbyPharmacies/Resources/AddressIndex.bundle";
 
 export interface CopyPlan {
   source: string;
@@ -43,15 +40,6 @@ export function syncPlan(webRoot: string, iosRepo: string, region: string, dataD
   const coveragePath = join(webRoot, dataDir, names.coverage);
   if (existsSync(coveragePath)) {
     plan.push({ source: coveragePath, target: join(iosRepo, IOS_DATA_DIR, names.coverage) });
-  }
-  const addressIndex = join(webRoot, ADDRESS_INDEX_DIR);
-  if (existsSync(addressIndex)) {
-    for (const name of readdirSync(addressIndex).toSorted()) {
-      plan.push({
-        source: join(addressIndex, name),
-        target: join(iosRepo, IOS_ADDRESS_INDEX_DIR, name),
-      });
-    }
   }
   plan.push({
     source: join(webRoot, RANKING_FIXTURE),

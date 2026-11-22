@@ -46,6 +46,5 @@
   "outsideFinland": "This starting point is outside Finland. Only pharmacies in Finland are shown.",
   "returnToHelsinki": "Return to Helsinki",
   "borderNotice": "Pharmacies across the border may be nearer but are not shown.",
-  "searchPrivacyPublicPlaces": "Enter a public place or address.",
-  "nearAddress": "Near {address}"
+  "searchPrivacyPublicPlaces": "Enter a public place or address."
 }

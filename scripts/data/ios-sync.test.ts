@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it, vi } from "vitest";
-import { IOS_ADDRESS_INDEX_DIR, IOS_DATA_DIR, IOS_FIXTURE_DIR, runCli } from "./ios-sync.ts";
+import { IOS_DATA_DIR, IOS_FIXTURE_DIR, runCli } from "./ios-sync.ts";
 import { dataFileNames, sha256 } from "./output.ts";
 
 describe("iOS sync and verify", () => {
@@ -58,17 +58,6 @@ describe("iOS sync and verify", () => {
     expect(runCli("verify", args, web)).toBe(1);
     expect(runCli("sync", args, web)).toBe(0);
     expect(readFileSync(join(ios, IOS_DATA_DIR, names.coverage), "utf8")).toBe(coverage);
-  });
-
-  it("copies the street address index into the app's address bundle", () => {
-    mkdirSync(join(web, "public/address-index"), { recursive: true });
-    writeFileSync(join(web, "public/address-index/index.json"), '["122-23"]');
-    writeFileSync(join(web, "public/address-index/122-23.json.gz"), "shard");
-    expect(runCli("verify", args, web)).toBe(1);
-    expect(runCli("sync", args, web)).toBe(0);
-    expect(readFileSync(join(ios, IOS_ADDRESS_INDEX_DIR, "index.json"), "utf8")).toBe('["122-23"]');
-    expect(readFileSync(join(ios, IOS_ADDRESS_INDEX_DIR, "122-23.json.gz"), "utf8")).toBe("shard");
-    expect(runCli("verify", args, web)).toBe(0);
   });
 
   it("exits non-zero when an iOS copy differs", () => {

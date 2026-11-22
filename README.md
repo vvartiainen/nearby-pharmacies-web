@@ -32,9 +32,8 @@ English.
   only. A [shared fixture](fixtures/ranking/ranking-v1.json) checks parity with the SwiftUI app
   in `nearby-pharmacies-ios`. [Coverage and ranking decisions](docs/adr/0001-finland-coverage-and-straight-line-ranking.md)
 - **Address search** sends submitted text, language, and country filter to Nominatim by default.
-  Bundled Finnish and Swedish place names provide a fallback. Device fixes and points chosen on
-  the map use an OSM address index. The browser loads regional files and looks up the closest
-  address locally. [Geocoder configuration and privacy](docs/adr/0002-geocoder-and-web-tiles.md)
+  Bundled Finnish and Swedish place names provide a fallback. Device fixes and map picks use
+  “Your location” and “Dropped pin.” [Geocoder configuration and privacy](docs/adr/0002-geocoder-and-web-tiles.md)
 - **Map tiles** come from OpenStreetMap through Leaflet. The tile provider receives requests for
   the visible map area. [Tile configuration](AGENTS.md#map-tiles)
 

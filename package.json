@@ -14,7 +14,6 @@
     "test:ui": "playwright test",
     "test:ui:install": "playwright install chromium webkit",
     "data:import": "node scripts/data/import.ts",
-    "data:addresses": "node scripts/data/import-addresses.ts",
     "data:sync-ios": "node scripts/data/sync-ios.ts",
     "data:verify": "node scripts/data/verify-ios.ts",
     "data:check-fixture": "python3 -I fixtures/ranking/compute_expected.py --check"

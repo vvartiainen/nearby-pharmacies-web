@@ -19,7 +19,7 @@ Node 26+. `package.json` pins pnpm 12.21.0. Install dependencies from `pnpm-lock
 | Path                       | Contents                                                                                              |
 | -------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `src/app/`                 | Compose the origin bar, results panel, map and desktop details. Owns state that spans those features. |
-| `src/features/origin/`     | Origin model, search and coverage UI, geocoder, local places, device location and address lookup.     |
+| `src/features/origin/`     | Origin model, search and coverage UI, geocoder, local places and device location.                     |
 | `src/features/pharmacies/` | Results panel, rows and details, ranking, distance formatting and opening hours.                      |
 | `src/features/map/`        | Leaflet map, pins, viewport, point picker and tile settings.                                          |
 | `src/shared/`              | Locale and message catalogs, coordinate math and base styles.                                         |
@@ -54,8 +54,8 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  13 passed (13)` and `Tests  156 passed (156)`                                                         |
-| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `51 passed` and `7 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  14 passed (14)` and `Tests  158 passed (158)`                                                         |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `45 passed` and `7 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |
@@ -74,7 +74,7 @@ covers both locales; `tests/e2e/selection.spec.ts` covers ranking, row and pin s
 with hours, keyboard use, the desktop details card, the narrow sheet heights, panning and 320 px
 width. `tests/e2e/origin.spec.ts` covers consent, location results and failures, address
 matches, city fallback, late replies, explicit and keyboard map picking and coverage notices. It stubs
-the online geocoder and device location and exercise the bundled address files. Pins near the station overlap at the initial zoom, so
+the online geocoder and device location. Pins near the station overlap at the initial zoom, so
 pointer tests pick a pin with `uncoveredPinName`.
 
 ## Origin search and location
@@ -94,10 +94,8 @@ neighborhood, municipality, and country where available. Arrow keys highlight a 
 chooses it, and Escape closes the dropdown.
 
 Device location starts on user action and needs HTTPS or localhost. The app ranks from the GPS
-fix immediately and looks for a nearby address using the bundled OSM index; a point chosen on the
-map gets the same lookup. It requests only the relevant regional files from the app host. An
-unavailable address leaves “Your location” or “Dropped pin” in the
-field. Panning or zooming only moves the map. “Choose on map” starts the picker: a target at the centre
+fix or chosen map point and labels the origin “Your location” or “Dropped pin.” Panning or
+zooming only moves the map. “Choose on map” starts the picker: a target at the centre
 of the visible map follows panning, and “Search from here” or “Cancel” (or Escape) ends it.
 Right-click or long-press to put the target at a point directly. The button moves focus to the
 map, so keyboard users can pan with the arrow keys before choosing “Search from here”.
@@ -137,8 +135,7 @@ Manual review loads real OSM tiles; keep it light (a few page loads, no scripted
    "© OpenStreetMap contributors" at the bottom right.
 3. Click a row or a pin. The selected pin grows, the other pharmacy pins turn gray, and the map
    fits the starting point and the selected pin with a dashed blue line outlined in white. The row
-   stays selected in the list. A details card over the map's top-left corner shows the name, distance, address and "Opening
-   hours" from Monday to Sunday; the zoom control is at the top right. "Close details" or Escape
+   stays selected in the list. A details card over the map's top-left corner shows the name, distance, address and usual weekly hours from Monday to Sunday; the zoom control is at the top right. "Close details" or Escape
    closes the card and returns focus to the row, which stays selected. Press Tab to reach the rows
    and Enter to select one; the focus ring is blue.
 4. The shared browser uses its own language list, so check it with `navigator.languages` in the
@@ -163,13 +160,13 @@ The data scripts run TypeScript directly with Node (type stripping), which needs
 or 26. Formats, reproducibility and licence are described in
 [`docs/data/README.md`](docs/data/README.md).
 
-| Purpose                                 | Command                                                          | Expected result                                                                |
-| --------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Import a PBF extract                    | `pnpm run data:import -- --input <file.osm.pbf> --region fi`     | `data:import: wrote N pharmacies and M places to src/data/ (osm-pbf, ...)`     |
-| Interim import from an Overpass answer  | `pnpm run data:import -- --overpass <overpass.json> --region fi` | `data:import: wrote N pharmacies to src/data/ (overpass-interim, ...)`         |
-| Copy data, addresses and fixture to iOS | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
-| Check the iOS copies                    | `pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios`    | `data:verify: N file(s) match`, exit 0; `missing:`/`differs:` lines and exit 1 |
-| Re-check the fixture in Python          | `pnpm run data:check-fixture`                                    | `fixture OK: 3 origins, 19 display cases`                                      |
+| Purpose                                | Command                                                          | Expected result                                                                |
+| -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Import a PBF extract                   | `pnpm run data:import -- --input <file.osm.pbf> --region fi`     | `data:import: wrote N pharmacies and M places to src/data/ (osm-pbf, ...)`     |
+| Interim import from an Overpass answer | `pnpm run data:import -- --overpass <overpass.json> --region fi` | `data:import: wrote N pharmacies to src/data/ (overpass-interim, ...)`         |
+| Copy data and fixture to iOS           | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
+| Check the iOS copies                   | `pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios`    | `data:verify: N file(s) match`, exit 0; `missing:`/`differs:` lines and exit 1 |
+| Re-check the fixture in Python         | `pnpm run data:check-fixture`                                    | `fixture OK: 3 origins, 19 display cases`                                      |
 
 The checked-in data comes from the Geofabrik Finland extract with OSM data from
 2026-11-21T21:20:51Z: 784 pharmacies and 4,675 places. To refresh it, download the extract (about
@@ -181,8 +178,8 @@ pnpm run data:import -- --input /tmp/finland-latest.osm.pbf --region fi
 pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios
 ```
 
-The sync writes `NearbyPharmacies/Resources/Data/`, `NearbyPharmacies/Resources/AddressIndex.bundle/`
-and `NearbyPharmaciesTests/Fixtures/` in the iOS repo. Commit both repos together. Regenerate the fixture's expected values only on purpose:
+The sync writes `NearbyPharmacies/Resources/Data/` and `NearbyPharmaciesTests/Fixtures/` in the
+iOS repo. Commit both repos together. Regenerate the fixture's expected values only on purpose:
 `python3 -I fixtures/ranking/compute_expected.py --write`, then
 `pnpm run format ./fixtures/ranking/ranking-v1.json`.
 
