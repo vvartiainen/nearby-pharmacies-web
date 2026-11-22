@@ -35,11 +35,14 @@ export function ResultsPanel({
   const sheetShowsDetails = !isDesktop && details !== undefined;
   const sheetExpanded = sheet === "expanded";
   const showSheetBack = sheetShowsDetails && sheetExpanded;
-  const nearest = sheetExpanded ? undefined : results[0];
+  const nearest = results[0];
+  const nearestSummary = nearest
+    ? interpolate(messages.nearestResult, { name: nearest.name, distance: nearest.distance })
+    : "";
   const sheetToggleLabel = sheetShowsDetails
     ? messages.detailsLabel
-    : nearest
-      ? interpolate(messages.nearestResult, { name: nearest.name, distance: nearest.distance })
+    : !sheetExpanded && nearestSummary
+      ? nearestSummary
       : messages.results;
 
   return (
@@ -50,6 +53,9 @@ export function ResultsPanel({
       data-view={sheetShowsDetails ? "details" : undefined}
       aria-label={messages.resultsTitle}
     >
+      <span className="visually-hidden" aria-live="polite" aria-atomic="true">
+        {nearestSummary}
+      </span>
       {isDesktop ? (
         <div className="results__header">
           <h2 className="results__title">{messages.resultsTitle}</h2>

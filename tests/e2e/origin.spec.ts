@@ -93,6 +93,9 @@ test("shows Helsinki before consent and reranks for a granted Tampere location",
   await page.getByRole("button", { name: "Use my location" }).click();
   await expect(page.getByTestId("origin")).toHaveValue("Your location");
   await expect(page.locator(".origin-marker")).toHaveAccessibleName("Your location");
+  await expect(page.locator('.results [aria-live="polite"]')).toHaveText(
+    /^Nearest: Tullintorin apteekki · 250\sm$/,
+  );
   if (testInfo.project.name === "narrow-webkit") {
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await expect(toggle).toHaveText(/^Nearest: Tullintorin apteekki · 250\sm$/);
