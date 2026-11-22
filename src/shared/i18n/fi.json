@@ -9,6 +9,8 @@
   "addressUnavailable": "Osoite ei saatavilla",
   "unnamedPharmacy": "Nimetön apteekki",
   "hoursHeading": "Aukioloajat",
+  "weeklyHoursHeading": "Tavalliset aukioloajat",
+  "holidayHoursNote": "Pyhinä aukioloajat voivat poiketa.",
   "hoursUnavailable": "Aukioloajat eivät saatavilla",
   "closed": "Suljettu",
   "days": "ma ti ke to pe la su",

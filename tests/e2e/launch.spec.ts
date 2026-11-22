@@ -83,7 +83,10 @@ test.describe("Finnish for a Finnish browser", () => {
 
     // Finnish times use a period and no leading zero.
     await row(page, "Steissin Apteekki").click();
-    await expect(page.getByTestId("hours").locator(".hours__day")).toHaveText([
+    const hours = page.getByTestId("hours");
+    await expect(hours.getByRole("heading", { name: "Tavalliset aukioloajat" })).toBeVisible();
+    await expect(hours.getByText("Pyhinä aukioloajat voivat poiketa.")).toBeVisible();
+    await expect(hours.locator(".hours__day")).toHaveText([
       "ma7.30–18.00",
       "ti7.30–18.00",
       "ke7.30–18.00",

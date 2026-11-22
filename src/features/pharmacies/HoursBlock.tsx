@@ -1,4 +1,4 @@
-import { interpretOpeningHours } from "./openingHours";
+import { interpretOpeningHours, type InterpretedHours } from "./openingHours";
 import type { SupportedLocale } from "../../shared/i18n/locale";
 import type { Messages } from "../../shared/i18n/messages";
 import { formatTimeRange } from "./time";
@@ -12,21 +12,25 @@ export function HoursBlock({
   messages: Messages;
   locale: SupportedLocale;
 }) {
+  const hours = openingHours?.trim() ? interpretOpeningHours(openingHours) : undefined;
+  const weekly = hours?.kind === "weekly";
   return (
     <section className="hours" data-testid="hours">
-      <h3 className="hours__heading">{messages.hoursHeading}</h3>
-      {hoursContent(openingHours, messages, locale)}
+      <h3 className="hours__heading">
+        {weekly ? messages.weeklyHoursHeading : messages.hoursHeading}
+      </h3>
+      {weekly && <p className="hours__holiday-note">{messages.holidayHoursNote}</p>}
+      {hoursContent(hours, messages, locale)}
     </section>
   );
 }
 
 function hoursContent(
-  openingHours: string | undefined,
+  hours: InterpretedHours | undefined,
   messages: Messages,
   locale: SupportedLocale,
 ) {
-  if (!openingHours?.trim()) return <p className="notice">{messages.hoursUnavailable}</p>;
-  const hours = interpretOpeningHours(openingHours);
+  if (!hours) return <p className="notice">{messages.hoursUnavailable}</p>;
   if (hours.kind === "raw") return <p className="hours__raw">{hours.text}</p>;
 
   const dayNames = messages.days.split(" ");

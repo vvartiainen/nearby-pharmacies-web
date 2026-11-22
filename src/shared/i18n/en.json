@@ -9,6 +9,8 @@
   "addressUnavailable": "Address unavailable",
   "unnamedPharmacy": "Unnamed pharmacy",
   "hoursHeading": "Opening hours",
+  "weeklyHoursHeading": "Usual weekly hours",
+  "holidayHoursNote": "Holiday hours may differ.",
   "hoursUnavailable": "Hours unavailable",
   "closed": "Closed",
   "days": "Mon Tue Wed Thu Fri Sat Sun",

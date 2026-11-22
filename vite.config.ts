@@ -8,7 +8,7 @@ export default defineConfig({
   // The single bundle holds the pharmacy snapshot (about 230 kB of JSON) and Leaflet.
   build: { chunkSizeWarningLimit: 700 },
   test: {
-    include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts"],
     environment: "node",
   },
 });

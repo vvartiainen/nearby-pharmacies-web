@@ -224,6 +224,12 @@
   font-weight: 600;
 }
 
+.hours__holiday-note {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .hours__day {
   display: grid;
   grid-template-columns: 3.5rem minmax(0, 1fr);

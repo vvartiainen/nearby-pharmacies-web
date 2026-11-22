@@ -131,7 +131,8 @@ test("selecting a row zooms in, selects its pin and shows details with hours", a
   await expect(details).toContainText(/50\sm straight line/);
   await expect(details).toContainText("Elielinaukio 3");
   const hours = details.getByTestId("hours");
-  await expect(hours.getByRole("heading", { name: "Opening hours" })).toBeVisible();
+  await expect(hours.getByRole("heading", { name: "Usual weekly hours" })).toBeVisible();
+  await expect(hours.getByText("Holiday hours may differ.")).toBeVisible();
   await expect(hours.locator(".hours__day")).toHaveText([
     "Mon07:30–18:00",
     "Tue07:30–18:00",
@@ -426,7 +427,7 @@ test("narrow layout: a wider drawer centers the pharmacy details and schedule to
   expect(spaceAbove).toBeGreaterThan(16);
   expect(spaceAbove).toBeCloseTo(spaceBelow, 1);
   const hours = details.getByTestId("hours");
-  const hoursHeading = hours.getByRole("heading", { name: "Opening hours" });
+  const hoursHeading = hours.getByRole("heading", { name: "Usual weekly hours" });
   const hoursBox = (await hoursHeading.boundingBox())!;
   const address = (await details.locator("address").boundingBox())!;
   expect(hoursBox.x).toBeGreaterThanOrEqual(address.x + address.width);

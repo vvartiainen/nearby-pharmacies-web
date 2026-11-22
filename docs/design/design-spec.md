@@ -157,12 +157,13 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 ### Hours block
 
-- Heading "Opening hours", then one line per day, Monday first, with the day in body strong and the
-  time ranges in body. Closed days say "Closed".
+- Heading "Usual weekly hours" and the note "Holiday hours may differ." above the regular
+  schedule. Show one line per day, Monday first, with the day in body strong and the time ranges
+  in body. Closed days say "Closed".
 - Times follow the interface language: English "07:30–18:00", Finnish "7.30–18.00" (period
   separator, no leading zero). Ranges are joined with an en dash.
-- When `opening_hours` is missing: a notice box "Hours unavailable". When present but not
-  interpretable by the app: show the raw text under the heading.
+- Use the heading "Opening hours" for the fallback states. Show a notice box "Hours unavailable"
+  when `opening_hours` is missing, and show the raw text when the app cannot interpret it.
 - No "open now" badge in this release.
 
 ### Results sheet and list
@@ -277,6 +278,8 @@ never translated. Strings with `{…}` take values.
 | Address unavailable     | Address unavailable                                                                              | Osoite ei saatavilla                                                                                   |
 | Unnamed pharmacy        | Unnamed pharmacy                                                                                 | Nimetön apteekki                                                                                       |
 | Hours heading           | Opening hours                                                                                    | Aukioloajat                                                                                            |
+| Weekly hours heading    | Usual weekly hours                                                                               | Tavalliset aukioloajat                                                                                 |
+| Holiday hours note      | Holiday hours may differ.                                                                        | Pyhinä aukioloajat voivat poiketa.                                                                     |
 | Hours unavailable       | Hours unavailable                                                                                | Aukioloajat eivät saatavilla                                                                           |
 | Closed                  | Closed                                                                                           | Suljettu                                                                                               |
 | Days                    | Mon Tue Wed Thu Fri Sat Sun                                                                      | ma ti ke to pe la su                                                                                   |
