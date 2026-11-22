@@ -55,7 +55,7 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
 | Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  14 passed (14)` and `Tests  158 passed (158)`                                                         |
-| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `45 passed` and `7 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `46 passed` and `8 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |

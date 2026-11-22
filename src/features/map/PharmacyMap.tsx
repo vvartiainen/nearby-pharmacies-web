@@ -16,7 +16,7 @@ import {
   type Marker,
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type RefObject } from "react";
 import type { LatLon } from "../../shared/geo/haversine";
 import { attributionHtml, tileSettings } from "./config";
 
@@ -49,6 +49,7 @@ export interface PharmacyMapProps {
   readonly searchFromHere: string;
   readonly cancel: string;
   readonly keepViewport: boolean;
+  readonly resultsPanelRef: RefObject<HTMLElement | null>;
 }
 
 const fitMaxZoom = 17;
@@ -103,6 +104,7 @@ export function PharmacyMap(props: PharmacyMapProps) {
   const automaticMove = useRef(false);
   const [mapPick, setMapPick] = useState<{
     point: LatLon;
+    fixed: boolean;
     origin: LatLon;
     selectionCount: number;
   } | null>(null);
@@ -111,8 +113,8 @@ export function PharmacyMap(props: PharmacyMapProps) {
     mapPick?.origin === origin && mapPick.selectionCount === selectionCount ? mapPick.point : null;
   const select = useEffectEvent((id: string) => props.onSelect(id));
   const keepViewport = useEffectEvent(() => props.keepViewport);
-  const chooseCandidate = useEffectEvent((point: { lat: number; lng: number }) => {
-    setMapPick({ point: { lat: point.lat, lon: point.lng }, origin, selectionCount });
+  const chooseCandidate = useEffectEvent((point: { lat: number; lng: number }, fixed = false) => {
+    setMapPick({ point: { lat: point.lat, lon: point.lng }, fixed, origin, selectionCount });
   });
   const candidateAtCentre = useEffectEvent((map: LeafletMap, start = false) => {
     if (automaticMove.current || (!start && !candidate)) return;
@@ -125,12 +127,10 @@ export function PharmacyMap(props: PharmacyMapProps) {
   const cancelPick = useEffectEvent((event: KeyboardEvent) => {
     if (candidate && event.key === "Escape") setMapPick(null);
   });
-  // A chosen point keeps the zoom, but when the sheet opened over it, the map pans it to the
-  // centre of the visible part.
-  const revealOrigin = useEffectEvent((map: LeafletMap) => {
+  const revealPoint = useEffectEvent((map: LeafletMap, position: LatLon) => {
     const size = map.getSize();
     const { left, bottom } = props.obscured();
-    const point = map.latLngToContainerPoint(toLatLng(origin));
+    const point = map.latLngToContainerPoint(toLatLng(position));
     const margin = 40;
     if (
       point.x >= left + margin &&
@@ -162,6 +162,14 @@ export function PharmacyMap(props: PharmacyMapProps) {
     }
   });
 
+  const adjustPicker = useEffectEvent(() => {
+    const map = mapRef.current;
+    if (!map || !candidate) return;
+    if (mapPick?.fixed) revealPoint(map, candidate);
+    else candidateAtCentre(map);
+  });
+
+  const { resultsPanelRef } = props;
   useEffect(() => {
     const container = containerRef.current!;
     const map = createMap(container, {
@@ -177,7 +185,7 @@ export function PharmacyMap(props: PharmacyMapProps) {
     map.on("moveend", () => candidateAtCentre(map));
     container.addEventListener("keydown", cancelPick);
     map.on("contextmenu", (event: LeafletMouseEvent) => {
-      chooseCandidate(event.latlng.wrap());
+      chooseCandidate(event.latlng.wrap(), true);
     });
     const resize = new ResizeObserver(() => {
       automaticMove.current = true;
@@ -186,15 +194,17 @@ export function PharmacyMap(props: PharmacyMapProps) {
       } finally {
         automaticMove.current = false;
       }
+      adjustPicker();
     });
     resize.observe(container);
+    if (resultsPanelRef.current) resize.observe(resultsPanelRef.current);
     return () => {
       resize.disconnect();
       container.removeEventListener("keydown", cancelPick);
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [resultsPanelRef]);
 
   const { zoomPosition } = props;
   useEffect(() => {
@@ -250,7 +260,7 @@ export function PharmacyMap(props: PharmacyMapProps) {
       const bounds = latLngBounds([toLatLng(origin), ...pins.map((pin) => toLatLng(pin.position))]);
       fitView(map, bounds);
     } else {
-      revealOrigin(map);
+      revealPoint(map, origin);
     }
 
     return () => {

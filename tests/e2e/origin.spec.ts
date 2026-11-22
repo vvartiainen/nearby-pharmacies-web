@@ -345,6 +345,47 @@ test("panning alone keeps the origin and choosing on the map can be cancelled", 
   await expect(page.getByTestId("origin")).toHaveValue(initialOrigin);
 });
 
+test("changing the drawer keeps an active map target visible", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "desktop-chromium", "narrow layout only");
+  await page.goto("/");
+  const map = page.getByTestId("map");
+  const drawer = page.locator(".results");
+  const target = page.locator(".map-picker__target");
+  const toggle = resultsToggle(page);
+  await page.getByRole("button", { name: "Choose on map" }).click();
+  await toggle.click();
+  await expect
+    .poll(async () => {
+      const box = (await target.boundingBox())!;
+      return box.y + box.height < (await drawer.boundingBox())!.y;
+    })
+    .toBe(true);
+  await toggle.click();
+  const mapBox = (await map.boundingBox())!;
+  await map.click({
+    button: "right",
+    position: { x: 70, y: Math.round((await drawer.boundingBox())!.y - mapBox.y - 30) },
+  });
+  const offsetFromOrigin = async () => {
+    const targetBox = (await target.boundingBox())!;
+    const origin = (await page.locator(".origin-marker").boundingBox())!;
+    return { x: targetBox.x - origin.x, y: targetBox.y - origin.y };
+  };
+  const before = await offsetFromOrigin();
+  await toggle.click();
+  await expect
+    .poll(async () => {
+      const box = (await target.boundingBox())!;
+      return box.y + box.height < (await drawer.boundingBox())!.y;
+    })
+    .toBe(true);
+  const after = await offsetFromOrigin();
+  expect(Math.abs(after.x - before.x)).toBeLessThan(2);
+  expect(Math.abs(after.y - before.y)).toBeLessThan(2);
+  await page.getByRole("button", { name: "Search from here" }).click();
+  await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
+});
+
 test("narrow layout: a point chosen on the map opens the drawer and stays in view", async ({
   page,
 }, testInfo) => {

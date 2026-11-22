@@ -124,6 +124,7 @@ export function App({ locale }: { locale: SupportedLocale }) {
           chooseOnMap={messages.chooseOnMap}
           searchFromHere={messages.searchFromHere}
           cancel={messages.cancelMapPick}
+          resultsPanelRef={sheetRef}
           keepViewport={state.origin.kind === "pin" && coverage !== "outside"}
         />
         {details && isDesktop ? (
