@@ -47,7 +47,9 @@ export interface PharmacyMapProps {
   readonly obscured: () => ObscuredEdges;
   readonly onSelect: (id: string) => void;
   readonly onPlaceOrigin: (point: LatLon) => void;
+  readonly chooseOnMap: string;
   readonly searchFromHere: string;
+  readonly cancel: string;
   readonly keepViewport: boolean;
 }
 
@@ -102,6 +104,8 @@ export function PharmacyMap(props: PharmacyMapProps) {
   const mapRef = useRef<LeafletMap | null>(null);
   const markersRef = useRef(new Map<string, Marker>());
   const automaticMove = useRef(false);
+  // Choosing a point starts only on request: "Choose on map" or a right click. While it lasts,
+  // the target follows the centre of the visible map; a new origin or selection ends it.
   const [mapPick, setMapPick] = useState<{
     point: LatLon;
     origin: LatLon;
@@ -114,13 +118,16 @@ export function PharmacyMap(props: PharmacyMapProps) {
   const chooseCandidate = useEffectEvent((point: { lat: number; lng: number }) => {
     setMapPick({ point: { lat: point.lat, lon: point.lng }, origin, selectionCount });
   });
-  const candidateAtCentre = useEffectEvent((map: LeafletMap) => {
-    if (automaticMove.current) return;
+  const candidateAtCentre = useEffectEvent((map: LeafletMap, start = false) => {
+    if (automaticMove.current || (!start && !candidate)) return;
     const size = map.getSize();
     const { left, bottom } = props.obscured();
     chooseCandidate(
       map.containerPointToLatLng([(size.x + left) / 2, (size.y - bottom) / 2]).wrap(),
     );
+  });
+  const cancelPick = useEffectEvent((event: KeyboardEvent) => {
+    if (candidate && event.key === "Escape") setMapPick(null);
   });
   const fitView = useEffectEvent((map: LeafletMap, bounds: LatLngBounds) => {
     automaticMove.current = true;
@@ -150,6 +157,7 @@ export function PharmacyMap(props: PharmacyMapProps) {
     tileLayer(tileSettings.url, { maxZoom: tileSettings.maxZoom }).addTo(map);
     mapRef.current = map;
     map.on("moveend", () => candidateAtCentre(map));
+    container.addEventListener("keydown", cancelPick);
     map.on("contextmenu", (event: LeafletMouseEvent) => {
       chooseCandidate(event.latlng.wrap());
     });
@@ -164,6 +172,7 @@ export function PharmacyMap(props: PharmacyMapProps) {
     resize.observe(container);
     return () => {
       resize.disconnect();
+      container.removeEventListener("keydown", cancelPick);
       map.remove();
       mapRef.current = null;
     };
@@ -282,6 +291,8 @@ export function PharmacyMap(props: PharmacyMapProps) {
     };
   }, [candidate]);
 
+  const focusMap = () => containerRef.current?.focus({ preventScroll: true });
+
   return (
     <>
       <section
@@ -291,18 +302,44 @@ export function PharmacyMap(props: PharmacyMapProps) {
         data-has-selection={selectedId !== null ? "" : undefined}
         aria-label={label}
       />
-      {candidate ? (
-        <button
-          type="button"
-          className="origin-action map-picker"
-          onClick={() => {
-            props.onPlaceOrigin(candidate);
-            containerRef.current?.focus({ preventScroll: true });
-          }}
-        >
-          {props.searchFromHere}
-        </button>
-      ) : null}
+      <div className="map-picker">
+        {candidate ? (
+          <>
+            <button
+              type="button"
+              className="origin-action origin-action--primary"
+              onClick={() => {
+                props.onPlaceOrigin(candidate);
+                focusMap();
+              }}
+            >
+              {props.searchFromHere}
+            </button>
+            <button
+              type="button"
+              className="origin-action"
+              onClick={() => {
+                setMapPick(null);
+                focusMap();
+              }}
+            >
+              {props.cancel}
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="origin-action"
+            onClick={() => {
+              candidateAtCentre(mapRef.current!, true);
+              // Arrow keys then move the map under the target.
+              focusMap();
+            }}
+          >
+            {props.chooseOnMap}
+          </button>
+        )}
+      </div>
     </>
   );
 }

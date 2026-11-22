@@ -496,6 +496,12 @@ output.origin-controls__caption {
   top: 2rem;
   right: var(--spacing-md);
   z-index: 1000;
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.map-picker .origin-action {
+  box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
 }
 
 .map-picker__target {

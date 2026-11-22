@@ -297,11 +297,36 @@ test("a map pick also wins over a late device fix", async ({ page }) => {
   await expect(locate.locator(".origin-location__spinner")).toBeVisible();
   await expect(page.getByRole("status")).toHaveClass("visually-hidden");
   await expect(page.getByTestId("origin")).toHaveValue(initialOrigin);
+  await page.getByRole("button", { name: "Choose on map" }).press("Enter");
+  await expect(page.getByTestId("map")).toBeFocused();
   await page.getByTestId("map").press("ArrowRight");
   await page.getByRole("button", { name: "Search from here" }).press("Enter");
   await page.evaluate(() => document.dispatchEvent(new Event("deliver-position")));
   await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
   await expect(page.getByRole("button", { name: "Use my location" })).toBeEnabled();
+});
+
+test("panning alone keeps the origin and choosing on the map can be cancelled", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const map = page.getByTestId("map");
+  await map.focus();
+  await map.press("ArrowRight");
+  await map.press("ArrowUp");
+  await expect(page.getByRole("button", { name: "Search from here" })).toHaveCount(0);
+  await expect(page.locator(".map-picker__target")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Choose on map" }).click();
+  await expect(page.locator(".map-picker__target")).toHaveCount(1);
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.locator(".map-picker__target")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Choose on map" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Choose on map" }).click();
+  await map.press("Escape");
+  await expect(page.getByRole("button", { name: "Search from here" })).toHaveCount(0);
+  await expect(page.getByTestId("origin")).toHaveValue(initialOrigin);
 });
 
 test("keeps the device location when a nearby address cannot be loaded", async ({ page }) => {

@@ -52,8 +52,8 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  11 passed (11)` and `Tests  153 passed (153)`                                                         |
-| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `46 passed` and `6 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  11 passed (11)` and `Tests  154 passed (154)`                                                         |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `48 passed` and `6 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |
@@ -71,7 +71,7 @@ aborts any other request that does not go to the preview server. `tests/e2e/laun
 covers both locales; `tests/e2e/selection.spec.ts` covers ranking, row and pin selection, details
 with hours, keyboard use, the desktop details card, the narrow sheet heights, panning and 320 px
 width. `tests/e2e/origin.spec.ts` covers consent, location results and failures, address
-matches, city fallback, late replies, keyboard map picking and coverage notices. It stubs
+matches, city fallback, late replies, explicit and keyboard map picking and coverage notices. It stubs
 the online geocoder and device location and exercise the bundled address files. Pins near the station overlap at the initial zoom, so
 pointer tests pick a pin with `uncoveredPinName`.
 
@@ -94,8 +94,10 @@ chooses it, and Escape closes the dropdown.
 Device location starts on user action and needs HTTPS or localhost. The app ranks from the GPS
 fix immediately and looks for a nearby address using the bundled OSM index. It requests only the
 relevant regional files from the app host. An unavailable address leaves “Your location” in the
-field. The map picker appears after panning or zooming. Right-click or long-press to position its target directly. Keyboard users can
-focus the map and pan with the arrow keys before choosing “Search from here”.
+field. Panning or zooming only moves the map. “Choose on map” starts the picker: a target at the centre
+of the visible map follows panning, and “Search from here” or “Cancel” (or Escape) ends it.
+Right-click or long-press to put the target at a point directly. The button moves focus to the
+map, so keyboard users can pan with the arrow keys before choosing “Search from here”.
 
 ## Map tiles
 
@@ -140,7 +142,8 @@ Manual review loads real OSM tiles; keep it light (a few page loads, no scripted
    page before judging the locale. Both locales are covered deterministically by
    `pnpm run test:ui`.
 5. Submit “Kauppakatu 1” once and choose a municipality from the dropdown. Check that the
-   field shows the selected match and the results change. Pan or right-click the map and choose “Search from here”. Try “Use my location” with
+   field shows the selected match and the results change. Pan the map and check that nothing else changes, then press “Choose on map”, pan
+   under the target and choose “Search from here”. Try “Use my location” with
    location blocked to check the fallback notice.
 6. Resize below 900 px (for example 390 and 320 px): the results become a sheet over the map that
    starts collapsed. The "Results" button expands it to 55 % of the map.

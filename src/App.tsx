@@ -233,7 +233,9 @@ export function App({ locale }: { locale: SupportedLocale }) {
           obscured={obscured}
           onSelect={selectPin}
           onPlaceOrigin={placePin}
+          chooseOnMap={messages.chooseOnMap}
           searchFromHere={messages.searchFromHere}
+          cancel={messages.cancelMapPick}
           keepViewport={state.origin.kind === "pin" && coverage !== "outside"}
         />
         {showDetails && isDesktop ? (
