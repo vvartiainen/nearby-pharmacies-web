@@ -1,0 +1,103 @@
+{
+  "query": "Mannerheimintie 1, Helsinki",
+  "kind": "full street address",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 1272,
+      "results": [
+        {
+          "name": "Erottajan Apteekki",
+          "precision": "amenity",
+          "osm": "amenity=pharmacy",
+          "road": "Mannerheimintie",
+          "houseNumber": "1",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.16804,
+          "lon": 24.94232
+        },
+        {
+          "name": null,
+          "precision": "place",
+          "osm": "place=house",
+          "road": "Mannerheimintie",
+          "houseNumber": "1",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.16815,
+          "lon": 24.94172
+        }
+      ]
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 431,
+      "results": [
+        {
+          "name": "Helsinki Music Centre",
+          "precision": "house",
+          "osm": "amenity=arts_centre",
+          "road": "Mannerheimintie",
+          "houseNumber": "13A",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.17379,
+          "lon": 24.93492
+        },
+        {
+          "name": null,
+          "precision": "house",
+          "osm": "place=house",
+          "road": "Mannerheimintie",
+          "houseNumber": "1",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.16815,
+          "lon": 24.94172
+        },
+        {
+          "name": "Erottajan Apteekki",
+          "precision": "house",
+          "osm": "amenity=pharmacy",
+          "road": "Mannerheimintie",
+          "houseNumber": "1",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.16804,
+          "lon": 24.94232
+        },
+        {
+          "name": "Mannerheimintie",
+          "precision": "street",
+          "osm": "highway=primary",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.1714,
+          "lon": 24.93612
+        },
+        {
+          "name": "Mannerheimintie",
+          "precision": "street",
+          "osm": "highway=primary",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.169,
+          "lon": 24.94008
+        }
+      ]
+    }
+  }
+}

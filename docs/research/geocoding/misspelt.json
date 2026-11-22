@@ -1,0 +1,78 @@
+{
+  "query": "Hämenkatu 1, Tampre",
+  "kind": "misspelt street and city",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 387,
+      "results": []
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 977,
+      "results": [
+        {
+          "name": "Tampere",
+          "precision": "city",
+          "osm": "place=city",
+          "road": null,
+          "houseNumber": null,
+          "municipality": null,
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.4978,
+          "lon": 23.76163
+        },
+        {
+          "name": "Tampere Market Hall",
+          "precision": "house",
+          "osm": "amenity=marketplace",
+          "road": "Hämeenkatu",
+          "houseNumber": "19",
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.49693,
+          "lon": 23.75879
+        },
+        {
+          "name": "Tampere Market Hall",
+          "precision": "house",
+          "osm": "shop=yes",
+          "road": "Hämeenkatu",
+          "houseNumber": "19",
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.49693,
+          "lon": 23.75879
+        },
+        {
+          "name": "Tampereen stadion",
+          "precision": "house",
+          "osm": "amenity=stadium",
+          "road": "Ratinan rantatie",
+          "houseNumber": "1",
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.49267,
+          "lon": 23.76606
+        },
+        {
+          "name": "Tampere Stadium",
+          "precision": "house",
+          "osm": "leisure=stadium",
+          "road": "Ratinan rantatie",
+          "houseNumber": "1",
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.49276,
+          "lon": 23.76413
+        }
+      ]
+    }
+  }
+}

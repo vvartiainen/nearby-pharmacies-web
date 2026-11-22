@@ -1,0 +1,139 @@
+{
+  "query": "Kauppakatu 1",
+  "kind": "ambiguous street, no municipality",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 644,
+      "results": [
+        {
+          "name": "Tampere Seura",
+          "precision": "amenity",
+          "osm": "amenity=archive",
+          "road": "Kauppakatu",
+          "houseNumber": "1",
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 61.49819,
+          "lon": 23.75937
+        },
+        {
+          "name": null,
+          "precision": "building",
+          "osm": "building=apartments",
+          "road": "Kauppakatu",
+          "houseNumber": "1",
+          "municipality": "Lahti",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.98155,
+          "lon": 25.6648
+        },
+        {
+          "name": null,
+          "precision": "place",
+          "osm": "place=house",
+          "road": "Kauppakatu",
+          "houseNumber": "1",
+          "municipality": "Kuopio",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 62.89265,
+          "lon": 27.69587
+        },
+        {
+          "name": "Котка парковка",
+          "precision": "amenity",
+          "osm": "amenity=parking",
+          "road": "Kauppakatu",
+          "houseNumber": "1",
+          "municipality": "Kotka",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.46609,
+          "lon": 26.94612
+        },
+        {
+          "name": null,
+          "precision": "place",
+          "osm": "place=house",
+          "road": "Kauppakatu",
+          "houseNumber": "1",
+          "municipality": "Joensuu",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 62.59518,
+          "lon": 29.75543
+        }
+      ]
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 575,
+      "results": [
+        {
+          "name": "Kauppakatu",
+          "precision": "street",
+          "osm": "highway=living_street",
+          "road": "Kauppakatu",
+          "houseNumber": null,
+          "municipality": "Jyväskylä",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 62.23984,
+          "lon": 25.74172
+        },
+        {
+          "name": "Kauppakatu",
+          "precision": "street",
+          "osm": "highway=residential",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Rauma",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.12835,
+          "lon": 21.50636
+        },
+        {
+          "name": "Kauppakatu",
+          "precision": "street",
+          "osm": "highway=pedestrian",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Jyväskylä",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 62.24246,
+          "lon": 25.74699
+        },
+        {
+          "name": "Kauppakatu",
+          "precision": "street",
+          "osm": "highway=residential",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Jyväskylä",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 62.23917,
+          "lon": 25.74044
+        },
+        {
+          "name": "Kauppakatu",
+          "precision": "street",
+          "osm": "highway=residential",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Kotka",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.46864,
+          "lon": 26.94271
+        }
+      ]
+    }
+  }
+}

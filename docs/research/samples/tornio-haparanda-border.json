@@ -1,0 +1,154 @@
+{
+  "title": "Tornio (FI) / Haparanda (SE) border, pharmacies from three origins",
+  "origin": {
+    "name": "Tornio",
+    "id": "node/30969802",
+    "tags": "place=town, name=Tornio",
+    "lat": 65.8457589,
+    "lon": 24.1464
+  },
+  "distanceNote": "straightLineKm is haversine with mean Earth radius 6371.0088 km, rounded to 4 decimals for this file only; the final constant and display rounding are agreed in task 5.",
+  "otherOrigins": [
+    {
+      "name": "Haparanda railway station (Sweden)",
+      "id": "node/1798579162",
+      "lat": 65.8281312,
+      "lon": 24.1308946,
+      "nearestFinnish": {
+        "id": "node/582471566",
+        "name": "Tornion I Apteekki",
+        "lat": 65.8426308,
+        "lon": 24.14374,
+        "address": {
+          "street": "Länsiranta",
+          "housenumber": "10",
+          "postcode": "95400",
+          "city": "Tornio"
+        },
+        "openingHours": "Mo-Fr 09:00-18:00",
+        "country": "FI",
+        "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+        "straightLineKm": 1.715
+      },
+      "nearerOutOfScope": [
+        {
+          "id": "node/11503723824",
+          "name": "Apoteket Aspen",
+          "lat": 65.8382629,
+          "lon": 24.1345099,
+          "address": {
+            "street": "Lasarettsgatan",
+            "housenumber": "34"
+          },
+          "openingHours": "Mo-Fr 08:00-17:00, Sa 08:00-13:00",
+          "source": "Overpass border-tornio-haparanda.overpassql, OSM base 2026-11-22",
+          "note": "Sweden; out of scope.",
+          "straightLineKm": 1.1386
+        },
+        {
+          "id": "node/11503925607",
+          "name": "Kronans Apotek",
+          "lat": 65.8407394,
+          "lon": 24.1330445,
+          "openingHours": "Mo-Fr 09:00-16:00, Sa 10:00-14:00",
+          "source": "Overpass border-tornio-haparanda.overpassql, OSM base 2026-11-22",
+          "note": "Sweden; out of scope.",
+          "straightLineKm": 1.4054
+        }
+      ]
+    }
+  ],
+  "swedishWithinTwoKmOfTornio": [
+    {
+      "id": "node/11503925607",
+      "name": "Kronans Apotek",
+      "lat": 65.8407394,
+      "lon": 24.1330445,
+      "openingHours": "Mo-Fr 09:00-16:00, Sa 10:00-14:00",
+      "source": "Overpass border-tornio-haparanda.overpassql, OSM base 2026-11-22",
+      "note": "Sweden; nearer than the 2nd Finnish result from the Tornio origin.",
+      "straightLineKm": 0.8251
+    },
+    {
+      "id": "node/11503723824",
+      "name": "Apoteket Aspen",
+      "lat": 65.8382629,
+      "lon": 24.1345099,
+      "address": {
+        "street": "Lasarettsgatan",
+        "housenumber": "34"
+      },
+      "openingHours": "Mo-Fr 08:00-17:00, Sa 08:00-13:00",
+      "source": "Overpass border-tornio-haparanda.overpassql, OSM base 2026-11-22",
+      "note": "Sweden.",
+      "straightLineKm": 0.9937
+    }
+  ],
+  "pharmacies": [
+    {
+      "id": "node/582471566",
+      "name": "Tornion I Apteekki",
+      "lat": 65.8426308,
+      "lon": 24.14374,
+      "address": {
+        "street": "Länsiranta",
+        "housenumber": "10",
+        "postcode": "95400",
+        "city": "Tornio"
+      },
+      "openingHours": "Mo-Fr 09:00-18:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 0.3683
+    },
+    {
+      "id": "way/49628851",
+      "name": "Alatornion apteekki",
+      "lat": 65.8433458,
+      "lon": 24.1894555,
+      "address": {
+        "street": "Teollisuuskatu",
+        "housenumber": "5",
+        "postcode": "95420",
+        "city": "Tornio"
+      },
+      "openingHours": "Mo-Fr 09:00-18:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z; coordinate is Overpass bbox centre",
+      "note": "Building way; Overpass bbox centre is 1.2 m from the polygon centroid.",
+      "straightLineKm": 1.9774
+    },
+    {
+      "id": "node/279248233",
+      "name": "Keminmaan apteekki",
+      "lat": 65.794884,
+      "lon": 24.5257621,
+      "address": {
+        "street": "Jauholantie",
+        "housenumber": "1-3",
+        "postcode": "94450",
+        "city": "Keminmaa"
+      },
+      "openingHours": "Mo-Fr 09:00-20:00; Sa 09:00-17:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 18.1807
+    },
+    {
+      "id": "node/7166893200",
+      "name": "Yliopiston apteekki",
+      "lat": 65.7370751,
+      "lon": 24.5615392,
+      "address": {
+        "street": "Pohjoisrantakatu",
+        "housenumber": "7",
+        "postcode": "94100",
+        "city": "Kemi"
+      },
+      "openingHours": "Mo-Fr 08:00-21:00; Sa 09:00-19:00; Su 10:00-18:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 22.4578
+    }
+  ]
+}

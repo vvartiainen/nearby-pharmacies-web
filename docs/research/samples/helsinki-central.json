@@ -1,0 +1,99 @@
+{
+  "title": "Helsinki Central Railway Station (default origin), nearest Finnish pharmacies",
+  "origin": {
+    "name": "Helsinki Central Railway Station",
+    "id": "node/25474663",
+    "tags": "railway=station, name=Helsinki",
+    "lat": 60.1720965,
+    "lon": 24.9412486
+  },
+  "distanceNote": "straightLineKm is haversine with mean Earth radius 6371.0088 km, rounded to 4 decimals for this file only; the final constant and display rounding are agreed in task 5.",
+  "pharmacies": [
+    {
+      "id": "node/1369465553",
+      "name": "Steissin Apteekki",
+      "lat": 60.1717338,
+      "lon": 24.940702,
+      "address": {
+        "street": "Elielinaukio",
+        "housenumber": "3",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "Mo-Fr 07:30-18:00; Sa 10:00-16:00; Su off",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 0.0504
+    },
+    {
+      "id": "node/12976930478",
+      "name": null,
+      "lat": 60.1700651,
+      "lon": 24.9416439,
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "note": "Unnamed node 7.3 m from node/11771777459 (same level -1); likely duplicate of Apteekki CityCenter.",
+      "straightLineKm": 0.2269
+    },
+    {
+      "id": "node/11771777459",
+      "name": "Apteekki CityCenter",
+      "lat": 60.1700011,
+      "lon": 24.9416154,
+      "openingHours": "Mo-Fr 08:00-19:00; Sa 10:00-17:00; Su off",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "note": "No address tags.",
+      "straightLineKm": 0.2339
+    },
+    {
+      "id": "node/1369465698",
+      "name": "Yliopiston apteekki",
+      "lat": 60.1695749,
+      "lon": 24.939536,
+      "address": {
+        "street": "Mannerheimintie",
+        "housenumber": "5",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "08:00-24:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "note": "Hours value has no weekday selector (applies every day). Near tie with node/4727972444: 0.1 m apart in distance.",
+      "straightLineKm": 0.296
+    },
+    {
+      "id": "node/4727972444",
+      "name": "Kluuvin apteekki",
+      "lat": 60.1696685,
+      "lon": 24.943445,
+      "address": {
+        "street": "Keskuskatu",
+        "housenumber": "7",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "Mo-Fr 08:00-20:00; Sa 11:00-17:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 0.2961
+    },
+    {
+      "id": "node/6049453002",
+      "name": "Erottajan Apteekki",
+      "lat": 60.1680374,
+      "lon": 24.9423205,
+      "address": {
+        "street": "Mannerheimintie",
+        "housenumber": "1",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "Mo-Fr 10:00-20:00; Sa 10:00-19:00; Su 12:00-18:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 0.4552
+    }
+  ]
+}

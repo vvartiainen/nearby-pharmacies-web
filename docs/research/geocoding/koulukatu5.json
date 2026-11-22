@@ -1,0 +1,139 @@
+{
+  "query": "Koulukatu 5",
+  "kind": "ambiguous street, no municipality",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 923,
+      "results": [
+        {
+          "name": null,
+          "precision": "building",
+          "osm": "building=yes",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Oulu",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 65.01336,
+          "lon": 25.484
+        },
+        {
+          "name": null,
+          "precision": "place",
+          "osm": "place=house",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Vaasa",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 63.08959,
+          "lon": 21.61156
+        },
+        {
+          "name": null,
+          "precision": "building",
+          "osm": "building=apartments",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Kotka",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.45937,
+          "lon": 26.93982
+        },
+        {
+          "name": null,
+          "precision": "place",
+          "osm": "place=house",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Joensuu",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 62.5943,
+          "lon": 29.74987
+        },
+        {
+          "name": null,
+          "precision": "building",
+          "osm": "building=yes",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Mikkeli",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 61.69939,
+          "lon": 27.27347
+        }
+      ]
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 486,
+      "results": [
+        {
+          "name": "Ämmän vesivoimalaitos",
+          "precision": "house",
+          "osm": "building=industrial",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Suomussalmi",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 64.87969,
+          "lon": 28.91485
+        },
+        {
+          "name": null,
+          "precision": "house",
+          "osm": "building=apartments",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Kotka",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.45937,
+          "lon": 26.93982
+        },
+        {
+          "name": null,
+          "precision": "house",
+          "osm": "building=school",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Imatra",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.18608,
+          "lon": 28.77388
+        },
+        {
+          "name": null,
+          "precision": "house",
+          "osm": "building=yes",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Raahe",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 64.68575,
+          "lon": 24.47559
+        },
+        {
+          "name": null,
+          "precision": "house",
+          "osm": "place=house",
+          "road": "Koulukatu",
+          "houseNumber": "5",
+          "municipality": "Kuhmo",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 64.12875,
+          "lon": 29.52085
+        }
+      ]
+    }
+  }
+}

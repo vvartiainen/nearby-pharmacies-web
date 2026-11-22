@@ -1,0 +1,43 @@
+{
+  "query": "Tammerfors",
+  "kind": "Swedish city name",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 483,
+      "results": [
+        {
+          "name": "Tampere",
+          "precision": "city",
+          "osm": "boundary=administrative",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 61.4978,
+          "lon": 23.76163
+        }
+      ]
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 556,
+      "results": [
+        {
+          "name": "Tako carton board mill",
+          "precision": "house",
+          "osm": "building=industrial",
+          "road": "Kirkkokatu",
+          "houseNumber": null,
+          "municipality": "Tampere",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 61.4965,
+          "lon": 23.76277
+        }
+      ]
+    }
+  }
+}

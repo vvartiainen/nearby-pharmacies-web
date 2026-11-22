@@ -1,0 +1,91 @@
+{
+  "query": "Åbo",
+  "kind": "Swedish city name",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 1493,
+      "results": [
+        {
+          "name": "Turku",
+          "precision": "city",
+          "osm": "boundary=administrative",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Turku",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.45159,
+          "lon": 22.267
+        }
+      ]
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 991,
+      "results": [
+        {
+          "name": "Åbo Akademi",
+          "precision": "house",
+          "osm": "amenity=university",
+          "road": "Hämeenkatu",
+          "houseNumber": null,
+          "municipality": "Turku",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.45345,
+          "lon": 22.27924
+        },
+        {
+          "name": "Åbo Svenska Teater",
+          "precision": "house",
+          "osm": "amenity=theatre",
+          "road": "Aurakatu",
+          "houseNumber": "10",
+          "municipality": "Turku",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.45072,
+          "lon": 22.26598
+        },
+        {
+          "name": "Åbovägen",
+          "precision": "street",
+          "osm": "highway=secondary",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Raseborg",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.10255,
+          "lon": 23.5741
+        },
+        {
+          "name": "Åbovägen",
+          "precision": "street",
+          "osm": "highway=secondary",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Raseborg",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.08305,
+          "lon": 23.66102
+        },
+        {
+          "name": "Åbovägen",
+          "precision": "street",
+          "osm": "highway=tertiary",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Raseborg",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.0794,
+          "lon": 23.66816
+        }
+      ]
+    }
+  }
+}

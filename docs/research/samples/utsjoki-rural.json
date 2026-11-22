@@ -1,0 +1,106 @@
+{
+  "title": "Utsjoki (sparse coverage), nearest Finnish pharmacies",
+  "origin": {
+    "name": "Utsjoki",
+    "id": "node/60070999",
+    "tags": "place=town, name=Utsjoki",
+    "lat": 69.907601,
+    "lon": 27.0252458
+  },
+  "distanceNote": "straightLineKm is haversine with mean Earth radius 6371.0088 km, rounded to 4 decimals for this file only; the final constant and display rounding are agreed in task 5.",
+  "outOfScopeNearer": [
+    {
+      "id": "node/2352922035",
+      "name": "Apotek Sapmi",
+      "lat": 69.472497,
+      "lon": 25.513111,
+      "openingHours": "Mo-Fr 09:00-16:00, Sa 10:00-14:00",
+      "source": "Overpass sample-utsjoki-region.overpassql, OSM base 2026-11-22",
+      "note": "Norway (Karasjok); out of scope but nearer than any Finnish pharmacy.",
+      "straightLineKm": 75.8045
+    }
+  ],
+  "pharmacies": [
+    {
+      "id": "node/5062474709",
+      "name": "Ivalon apteekki",
+      "lat": 68.6568793,
+      "lon": 27.5391982,
+      "address": {
+        "street": "Ivalontie",
+        "housenumber": "10",
+        "postcode": "99800",
+        "city": "Ivalo"
+      },
+      "openingHours": "Mo-Fr 09:00-17:00; Sa 10:00-14:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 140.5346
+    },
+    {
+      "id": "node/1512767497",
+      "name": "Enontekiön sivuapteekki",
+      "lat": 68.3844251,
+      "lon": 23.6379101,
+      "address": {
+        "street": "Kustaavantie",
+        "housenumber": "1",
+        "postcode": "99400",
+        "city": "Hetta"
+      },
+      "openingHours": "Mo-Fr 09:30-16:30",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 215.9566
+    },
+    {
+      "id": "node/355703801",
+      "name": "Levin apteekki",
+      "lat": 67.8054722,
+      "lon": 24.8027769,
+      "address": {
+        "street": "Levinraitti",
+        "housenumber": "1",
+        "postcode": "99130",
+        "city": "Sirkka"
+      },
+      "openingHours": "Mo-Fr 10:00-17:00; PH, Su off",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 250.1273
+    },
+    {
+      "id": "node/10712398188",
+      "name": "Muonion Apteekki",
+      "lat": 67.956018,
+      "lon": 23.6832732,
+      "address": {
+        "street": "Lahenrannantie",
+        "housenumber": "1",
+        "postcode": "99300",
+        "city": "Muonio"
+      },
+      "openingHours": "Mo-Fr 09:00-17:00; Sa 10:00-14:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "straightLineKm": 254.7471
+    },
+    {
+      "id": "node/1327867422",
+      "name": "Sodankylän Apteekki",
+      "lat": 67.4176728,
+      "lon": 26.59369,
+      "address": {
+        "street": "Jäämerentie",
+        "housenumber": "13",
+        "postcode": "99600",
+        "city": "Sodankylä"
+      },
+      "openingHours": "Mo 09:00-18:00; Sa 10:00-15:00; Su off; Tu-Fr 09:00-17:00",
+      "country": "FI",
+      "source": "Overpass finland-pharmacies.overpassql, OSM base 2026-11-22T13:04:20Z",
+      "note": "Hours rules are not in weekday order.",
+      "straightLineKm": 277.416
+    }
+  ]
+}

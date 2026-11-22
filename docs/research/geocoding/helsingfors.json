@@ -1,0 +1,91 @@
+{
+  "query": "Helsingfors",
+  "kind": "Swedish city name",
+  "trialDate": "2026-11-22",
+  "providers": {
+    "nominatim": {
+      "request": "GET https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=fi&limit=5&accept-language=en&q=…",
+      "latencyMs": 358,
+      "results": [
+        {
+          "name": "Helsinki",
+          "precision": "city",
+          "osm": "boundary=administrative",
+          "road": null,
+          "houseNumber": null,
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "fi",
+          "lat": 60.16662,
+          "lon": 24.94354
+        }
+      ]
+    },
+    "photon": {
+      "request": "GET https://photon.komoot.io/api?limit=5&countrycode=FI&lang=en&layer=house&layer=street&layer=city&layer=locality&layer=district&q=…",
+      "latencyMs": 476,
+      "results": [
+        {
+          "name": "Helsingfors Adventkyrka",
+          "precision": "house",
+          "osm": "amenity=place_of_worship",
+          "road": "Annankatu",
+          "houseNumber": "7",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.1638,
+          "lon": 24.94161
+        },
+        {
+          "name": "Helsingfors KFUK/M Scouter",
+          "precision": "house",
+          "osm": "amenity=community_centre",
+          "road": "Sorolantie",
+          "houseNumber": "2 C",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.25244,
+          "lon": 24.86893
+        },
+        {
+          "name": "Helsingfors Svenska Metodistförsamling Kansli",
+          "precision": "house",
+          "osm": "office=religion",
+          "road": "Apollonkatu",
+          "houseNumber": "5",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.17589,
+          "lon": 24.92687
+        },
+        {
+          "name": "Helsingfors svenska metodistförsamling",
+          "precision": "house",
+          "osm": "amenity=place_of_worship",
+          "road": "Apollonkatu",
+          "houseNumber": "5",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.17593,
+          "lon": 24.92732
+        },
+        {
+          "name": "Helsingfors Segelsällskap r.f. (HSS)",
+          "precision": "house",
+          "osm": "amenity=community_centre",
+          "road": "Liuskasaari",
+          "houseNumber": "1",
+          "municipality": "Helsinki",
+          "country": "Finland",
+          "countryCode": "FI",
+          "lat": 60.15143,
+          "lon": 24.94716
+        }
+      ]
+    }
+  }
+}
