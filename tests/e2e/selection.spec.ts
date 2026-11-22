@@ -1,5 +1,5 @@
 import type { Locator, Page, TestInfo } from "@playwright/test";
-import { expect, pin, row, test, uncoveredPinName } from "./support/test";
+import { expect, pin, resultsToggle, row, test, uncoveredPinName } from "./support/test";
 
 test.use({ locale: "en-GB", colorScheme: "light" });
 
@@ -71,7 +71,7 @@ async function sheetHeight(page: Page) {
 }
 
 async function expandSheetIfNarrow(page: Page) {
-  const toggle = page.getByRole("button", { name: "Results", exact: true });
+  const toggle = resultsToggle(page);
   if ((await toggle.count()) > 0 && (await toggle.getAttribute("aria-expanded")) === "false") {
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
@@ -183,7 +183,7 @@ test("keyboard: Tab reaches a row with a visible focus ring and Enter selects it
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button", { name: "Not now" })).toBeFocused();
   if (!isDesktop(testInfo)) {
-    const toggle = page.getByRole("button", { name: "Results", exact: true });
+    const toggle = resultsToggle(page);
     await page.keyboard.press("Tab");
     await expect(toggle).toBeFocused();
     await page.keyboard.press("Enter");
@@ -315,21 +315,21 @@ test("narrow layout: collapsing hides results and selecting a map pin expands th
 }, testInfo) => {
   test.skip(isDesktop(testInfo), "narrow layout only");
   await page.goto("/");
-  const resultsToggle = page.getByRole("button", { name: "Results", exact: true });
+  const toggle = resultsToggle(page);
   const detailsToggle = page.getByRole("button", { name: "Pharmacy details", exact: true });
   const back = page.getByRole("button", { name: "Back to results" });
   const rows = page.locator(".result-row");
-  await expect(resultsToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(rows).toHaveCount(0);
   const collapsedHeight = await sheetHeight(page);
 
-  await resultsToggle.click();
-  await expect(resultsToggle).toHaveAttribute("aria-expanded", "true");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await expect(rows).toHaveCount(20);
   const mapBox = (await page.locator(".map-area").boundingBox())!;
   expect(Math.abs((await sheetHeight(page)) - mapBox.height * 0.55)).toBeLessThanOrEqual(2);
 
-  await resultsToggle.click();
+  await toggle.click();
   await expect(rows).toHaveCount(0);
   expect(await sheetHeight(page)).toBeCloseTo(collapsedHeight, 0);
 
@@ -348,7 +348,7 @@ test("narrow layout: collapsing hides results and selecting a map pin expands th
   await expect(detailsToggle).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByTestId("details").getByRole("heading", { level: 2 })).toHaveText(name);
   await back.click();
-  await expect(resultsToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await expect(rows).toHaveCount(20);
   await expect(page.locator('.result-row[aria-pressed="true"]')).toBeFocused();
 });
@@ -439,6 +439,12 @@ test("narrow layout: a wider drawer centers the pharmacy details and schedule to
 test("fits 320 px without horizontal scrolling", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto("/");
+  await expect(resultsToggle(page)).toHaveText(/^Nearest: Steissin Apteekki · 50\sm$/);
+  const overflow = () =>
+    page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+  expect(await overflow()).toBe(0);
   await expandSheetIfNarrow(page);
   await expect(page.locator(".result-row")).toHaveCount(20);
   const first = (await page.locator(".result-row").nth(0).boundingBox())!;
@@ -446,10 +452,7 @@ test("fits 320 px without horizontal scrolling", async ({ page }) => {
   expect(first.x).toBe(10);
   expect(first.height).toBe(44);
   expect(second.y - first.y - first.height).toBe(4);
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  );
-  expect(overflow).toBe(0);
+  expect(await overflow()).toBe(0);
 });
 
 test("desktop: selection zooms out to fit a distant pharmacy and the origin", async ({

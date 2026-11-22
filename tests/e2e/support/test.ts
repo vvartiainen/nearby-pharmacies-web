@@ -39,6 +39,10 @@ export const test = base.extend<{ tiles: TileLog }>({
 
 export { expect };
 
+export function resultsToggle(page: Page) {
+  return page.getByRole("button", { name: /^(Results$|Nearest: )/ });
+}
+
 export function row(page: Page, name: string) {
   return page
     .getByRole("button", { name: new RegExp(`^${name}, `) })

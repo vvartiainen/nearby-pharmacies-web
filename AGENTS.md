@@ -149,7 +149,8 @@ Manual review loads real OSM tiles; keep it light (a few page loads, no scripted
    under the target and choose “Search from here”. Try “Use my location” with
    location blocked to check the fallback notice.
 6. Resize below 900 px (for example 390 and 320 px): the results become a sheet over the map that
-   starts collapsed. The "Results" button expands it to 55 % of the map.
+   starts collapsed. Its button shows the nearest pharmacy and distance, updates after a location
+   fix or search match, and expands the sheet to 55 % of the map.
    Selecting expands the drawer and shows details. "Back to results" stays visible while scrolling
    and returns to the expanded list. Collapse the drawer to show only its toggle.
    At 700 px the hours and pharmacy information form a centered block. The back button and

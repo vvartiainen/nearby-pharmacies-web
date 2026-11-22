@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import borderSample from "../../docs/research/samples/tornio-haparanda-border.json" with { type: "json" };
 import addressSample from "../../docs/research/geocoding/kauppakatu1.json" with { type: "json" };
-import { expect, pin, row, test } from "./support/test";
+import { expect, pin, resultsToggle, row, test } from "./support/test";
 
 test.use({ locale: "en-GB", colorScheme: "light" });
 
@@ -42,7 +42,7 @@ async function mockLocation(page: Page, results: readonly LocationResult[], defe
 }
 
 async function ensureResultsOpen(page: Page) {
-  const toggle = page.getByRole("button", { name: "Results", exact: true });
+  const toggle = resultsToggle(page);
   if ((await toggle.count()) && (await toggle.getAttribute("aria-expanded")) === "false") {
     await toggle.click();
   }
@@ -97,18 +97,28 @@ test("shows Helsinki before consent and reranks for a granted Tampere location",
   await expect(page.getByTestId("origin")).toHaveValue(initialOrigin);
   await expect(page.getByText("Show pharmacies nearest to you?")).toBeVisible();
   await expect(page.locator("html")).not.toHaveAttribute("data-location-requests");
-  await ensureResultsOpen(page);
-  await expect(firstResult(page)).toHaveText("Steissin Apteekki");
+  const toggle = resultsToggle(page);
+  if (testInfo.project.name === "narrow-webkit") {
+    await expect(toggle).toHaveText(/^Nearest: Steissin Apteekki · 50\sm$/);
+  } else {
+    await expect(firstResult(page)).toHaveText("Steissin Apteekki");
+  }
   try {
     await page.getByRole("button", { name: "Use my location" }).click();
     await expect(page.getByTestId("origin")).toHaveValue("Your location");
-    await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
+    if (testInfo.project.name === "narrow-webkit") {
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(toggle).toHaveText(/^Nearest: Tullintorin apteekki · 250\sm$/);
+    } else {
+      await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
+    }
   } finally {
     releaseAddress.resolve();
   }
   await expect(page.getByTestId("origin")).toHaveValue("Near Rautatienkatu 25, Tampere");
   await expect(page.locator(".origin-search__title")).toHaveText("Near Rautatienkatu 25");
   await expect(page.locator(".origin-search__locality")).toHaveText("Tampere");
+  await ensureResultsOpen(page);
   await expect(firstResult(page)).toHaveText("Tullintorin apteekki");
   await row(page, "Tullintorin apteekki").click();
   await expect(pin(page, "Tullintorin apteekki")).toHaveAttribute("aria-pressed", "true");
@@ -132,7 +142,7 @@ for (const [code, notice] of [
 
 test("a submitted address lists distinct municipalities and can be chosen with the keyboard", async ({
   page,
-}) => {
+}, testInfo) => {
   const requests: URL[] = [];
   await page.route(searchUrl, async (route) => {
     requests.push(new URL(route.request().url()));
@@ -165,6 +175,11 @@ test("a submitted address lists distinct municipalities and can be chosen with t
   const localityBox = (await locality.boundingBox())!;
   expect(localityBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height);
   await expect(choices).toHaveCount(0);
+  if (testInfo.project.name === "narrow-webkit") {
+    const toggle = resultsToggle(page);
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(toggle).toHaveText(/^Nearest: Yliopiston Apteekki · 60\sm$/);
+  }
   await ensureResultsOpen(page);
   await expect(firstResult(page)).toHaveText("Yliopiston Apteekki");
   expect(requests).toHaveLength(1);
@@ -396,7 +411,7 @@ test("narrow layout: a point chosen on the map opens the drawer and stays in vie
   test.skip(testInfo.project.name === "desktop-chromium", "narrow layout only");
   await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
   await page.goto("/");
-  const toggle = page.getByRole("button", { name: "Results", exact: true });
+  const toggle = resultsToggle(page);
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   // A point just above the collapsed drawer, where the expanded drawer would cover it.
   const map = page.getByTestId("map");

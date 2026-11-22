@@ -23,7 +23,17 @@ test.describe("English fallback for an unsupported browser language", () => {
     if (testInfo.project.name === "desktop-chromium") {
       await expect(page.getByRole("heading", { name: "Nearest pharmacies" })).toBeVisible();
     } else {
-      await page.getByRole("button", { name: "Results", exact: true }).click();
+      const toggle = page.getByRole("button", { name: /^Nearest: Steissin Apteekki · 50\sm$/ });
+      await expect(toggle).toBeVisible();
+      await expect(toggle).toHaveText(/^Nearest: Steissin Apteekki · 50\sm$/);
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await expect(toggle).toHaveAttribute("aria-controls", "results-content");
+      await expect(page.locator("#results-content")).toBeHidden();
+      await toggle.click();
+      await expect(page.getByRole("button", { name: "Results", exact: true })).toHaveAttribute(
+        "aria-expanded",
+        "true",
+      );
       await expect(page.getByRole("heading", { name: "Nearest pharmacies" })).toHaveCount(0);
     }
 
@@ -62,7 +72,11 @@ test.describe("Finnish for a Finnish browser", () => {
     if (testInfo.project.name === "desktop-chromium") {
       await expect(page.getByRole("heading", { name: "Lähimmät apteekit" })).toBeVisible();
     } else {
-      await page.getByRole("button", { name: "Tulokset", exact: true }).click();
+      const toggle = page.getByRole("button", { name: /^Lähin: Steissin Apteekki · 50\sm$/ });
+      await expect(toggle).toBeVisible();
+      await expect(toggle).toHaveText(/^Lähin: Steissin Apteekki · 50\sm$/);
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await toggle.click();
     }
     await expect(row(page, "Steissin Apteekki")).toHaveAccessibleName(/^Steissin Apteekki, 50\sm$/);
     await expect(page.getByRole("region", { name: "Apteekkikartta" })).toBeVisible();

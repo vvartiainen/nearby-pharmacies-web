@@ -1,5 +1,5 @@
 import type { ReactElement, Ref } from "react";
-import type { Messages } from "../../shared/i18n/messages";
+import { interpolate, type Messages } from "../../shared/i18n/messages";
 import { ResultRow } from "./ResultRow";
 import type { PharmacyResult } from "./results";
 
@@ -35,7 +35,12 @@ export function ResultsPanel({
   const sheetShowsDetails = !isDesktop && details !== undefined;
   const sheetExpanded = sheet === "expanded";
   const showSheetBack = sheetShowsDetails && sheetExpanded;
-  const sheetToggleLabel = sheetShowsDetails ? messages.detailsLabel : messages.results;
+  const nearest = sheetExpanded ? undefined : results[0];
+  const sheetToggleLabel = sheetShowsDetails
+    ? messages.detailsLabel
+    : nearest
+      ? interpolate(messages.nearestResult, { name: nearest.name, distance: nearest.distance })
+      : messages.results;
 
   return (
     <section
@@ -62,12 +67,14 @@ export function ResultsPanel({
           <button
             type="button"
             className="sheet-toggle"
-            aria-label={sheetToggleLabel}
+            aria-label={showSheetBack ? sheetToggleLabel : undefined}
             aria-expanded={sheetExpanded}
             aria-controls="results-content"
             onClick={onToggleSheet}
           >
-            {!showSheetBack ? sheetToggleLabel : null}
+            {!showSheetBack ? (
+              <span className="sheet-toggle__label">{sheetToggleLabel}</span>
+            ) : null}
             <svg className="sheet-toggle__chevron" viewBox="0 0 16 16" aria-hidden="true">
               <path d="m3 10 5-5 5 5" fill="none" stroke="currentColor" strokeWidth="2" />
             </svg>

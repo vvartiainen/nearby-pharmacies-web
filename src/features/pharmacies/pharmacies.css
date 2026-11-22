@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--spacing-sm);
   min-width: var(--hit-target);
   min-height: var(--hit-target);
   padding: 0 var(--spacing-sm);
@@ -24,6 +25,10 @@
 
 .back-button + .sheet-toggle {
   justify-content: center;
+}
+
+.sheet-toggle__label {
+  overflow-wrap: anywhere;
 }
 
 .sheet-toggle__chevron {

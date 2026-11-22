@@ -2,6 +2,7 @@
   "title": "Apteekkihaku",
   "defaultOrigin": "Helsingin päärautatieasema (oletus)",
   "results": "Tulokset",
+  "nearestResult": "Lähin: {name} · {distance}",
   "resultsTitle": "Lähimmät apteekit",
   "scopeAndCount": "{count} kartoitettua apteekkia Suomessa",
   "straightLine": "{distance} linnuntietä",

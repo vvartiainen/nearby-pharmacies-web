@@ -182,9 +182,10 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
   focus to the name; opening it from a pin keeps focus on the pin. Selecting from the list or map
   fits the starting point and the selected pin to the right of the card and draws a dashed
   blue straight line with a white outline between them. The zoom control sits at the top right, clear of the card.
-- Narrow web: the collapsed drawer shows only a toggle that reopens its current view. Selecting
-  a row or pin expands it to 55 % of the map area, shows details, and fits both markers and the line
-  above the drawer.
+- Narrow web: the collapsed drawer's toggle reopens its current view. In the results view, the
+  toggle shows the first result's name and distance, updating when the starting point changes.
+  Selecting a row or pin expands the drawer to 55 % of the map area, shows details, and fits both
+  markers and the line above the drawer.
   "Back to results" stays above the scrolling content and reopens the expanded list with focus on
   the selected row. The toolbar spans the drawer. In expanded details, it places the back button
   on the left and the drawer toggle on the right. The list shares a side gutter with the origin
@@ -269,6 +270,7 @@ never translated. Strings with `{…}` take values.
 | Location unavailable    | Location unavailable. Search for a city or address, or choose a point on the map.                | Sijainti ei ole käytettävissä. Hae kaupunkia tai osoitetta tai valitse kohta kartalta.                 |
 | Results title           | Nearest pharmacies                                                                               | Lähimmät apteekit                                                                                      |
 | Results toggle (web)    | Results                                                                                          | Tulokset                                                                                               |
+| Collapsed results (web) | Nearest: {name} · {distance}                                                                     | Lähin: {name} · {distance}                                                                             |
 | Dataset count (web)     | {count} mapped pharmacies in Finland                                                             | {count} kartoitettua apteekkia Suomessa                                                                |
 | Scope and count (iOS)   | Mapped pharmacies in Finland · {count}                                                           | Kartoitetut apteekit Suomessa · {count}                                                                |
 | Distance                | {distance} straight line                                                                         | {distance} linnuntietä                                                                                 |

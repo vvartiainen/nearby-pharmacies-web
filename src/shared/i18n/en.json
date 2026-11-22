@@ -2,6 +2,7 @@
   "title": "Pharmacy finder",
   "defaultOrigin": "Helsinki Central Railway Station (default)",
   "results": "Results",
+  "nearestResult": "Nearest: {name} · {distance}",
   "resultsTitle": "Nearest pharmacies",
   "scopeAndCount": "{count} mapped pharmacies in Finland",
   "straightLine": "{distance} straight line",
