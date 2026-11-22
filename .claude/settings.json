@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/style-check.mjs\" --hook",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

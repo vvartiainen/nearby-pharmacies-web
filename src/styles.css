@@ -1,0 +1,37 @@
+:root {
+  color-scheme: light dark;
+  --color-text: #1b1f24;
+  --color-muted: #57606a;
+  --color-surface: #ffffff;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #e6edf3;
+    --color-muted: #9da7b3;
+    --color-surface: #0d1117;
+  }
+}
+
+body {
+  margin: 0;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+figure {
+  margin: 0;
+}
+
+figcaption {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}

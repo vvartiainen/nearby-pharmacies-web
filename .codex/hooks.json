@@ -1,0 +1,17 @@
+{
+  "description": "Check-only Oxlint and Oxfmt on changed and new files when a turn stops.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/style-check.mjs\" --hook",
+            "timeout": 60,
+            "statusMessage": "Checking changed files with Oxlint and Oxfmt"
+          }
+        ]
+      }
+    ]
+  }
+}

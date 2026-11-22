@@ -1,0 +1,149 @@
+#!/usr/bin/env node
+// Check-only Oxlint and Oxfmt run over changed and new files in this repository.
+//
+//   node scripts/style-check.mjs          exit 0 when clean, 1 with diagnostics on failure
+//   node scripts/style-check.mjs --hook   agent Stop hook mode for Claude Code and Codex
+//
+// Files checked: tracked files with staged or unstaged changes plus untracked files that Git does
+// not ignore. Deleted files, symlinks and unsupported extensions are skipped. Nothing is rewritten.
+
+import { spawnSync } from "node:child_process";
+import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
+import { dirname, extname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const lintExtensions = new Set([".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts"]);
+const formatExtensions = new Set([
+  ...lintExtensions,
+  ".json",
+  ".jsonc",
+  ".css",
+  ".html",
+  ".md",
+  ".yaml",
+  ".yml",
+]);
+const generatedFiles = new Set(["package-lock.json"]);
+const maxReasonLength = 12_000;
+
+const root = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), ".."));
+const hookMode = process.argv.includes("--hook");
+
+function run(command, args) {
+  const result = spawnSync(command, args, { cwd: root, encoding: "utf8", maxBuffer: 64 << 20 });
+  if (result.error) throw result.error;
+  return { status: result.status ?? 1, output: `${result.stdout}${result.stderr}`.trim() };
+}
+
+function git(args) {
+  const result = run("git", args);
+  if (result.status !== 0) throw new Error(`git ${args.join(" ")} failed:\n${result.output}`);
+  return result.output;
+}
+
+function nulList(args) {
+  const result = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 64 << 20 });
+  if (result.error) throw result.error;
+  if (result.status !== 0) throw new Error(`git ${args.join(" ")} failed:\n${result.stderr}`);
+  return result.stdout.split("\0").filter(Boolean);
+}
+
+function changedFiles() {
+  const top = git(["rev-parse", "--show-toplevel"]);
+  if (realpathSync(top) !== root) throw new Error(`Expected Git root ${root}, found ${top}`);
+  const paths = new Set([
+    ...nulList(["diff", "--cached", "--name-only", "-z", "--diff-filter=ACMRT"]),
+    ...nulList(["diff", "--name-only", "-z", "--diff-filter=ACMRT"]),
+    ...nulList(["ls-files", "--others", "--exclude-standard", "-z"]),
+  ]);
+  return [...paths]
+    .filter((path) => {
+      if (generatedFiles.has(path.split("/").at(-1))) return false;
+      if (!formatExtensions.has(extname(path).toLowerCase())) return false;
+      const absolute = join(root, path);
+      return existsSync(absolute) && lstatSync(absolute).isFile();
+    })
+    .toSorted();
+}
+
+function tool(name) {
+  const binary = join(root, "node_modules", ".bin", name);
+  if (!existsSync(binary)) throw new Error(`${name} is not installed. Run: npm ci`);
+  return binary;
+}
+
+// Prefix with ./ so a path that starts with "-" is never read as an option.
+const asArgs = (files) => files.map((file) => `./${file}`);
+const shellQuote = (file) =>
+  /^[\w./-]+$/.test(file) ? `./${file}` : `'./${file.replaceAll("'", "'\\''")}'`;
+
+function check() {
+  const files = changedFiles();
+  if (files.length === 0) return { ok: true, summary: "style: no changed source files" };
+
+  const problems = [];
+  const lintable = files.filter((file) => lintExtensions.has(extname(file).toLowerCase()));
+  if (lintable.length > 0) {
+    const lint = run(tool("oxlint"), ["--deny-warnings", ...asArgs(lintable)]);
+    if (lint.status !== 0) {
+      problems.push(`Oxlint reported problems:\n${lint.output}`);
+    }
+  }
+
+  const format = run(tool("oxfmt"), ["--list-different", ...asArgs(files)]);
+  if (format.status !== 0) {
+    const listed = format.output
+      .split("\n")
+      .map((line) => line.trim().replace(/^\.\//, ""))
+      .filter((line) => files.includes(line));
+    const fix =
+      listed.length > 0 ? `\nFix with: npm run format -- ${listed.map(shellQuote).join(" ")}` : "";
+    problems.push(`Oxfmt found files that are not formatted:\n${format.output}${fix}`);
+  }
+
+  if (problems.length === 0) {
+    return { ok: true, summary: `style: OK, ${files.length} changed file(s): ${files.join(", ")}` };
+  }
+  return {
+    ok: false,
+    summary: `style: FAILED in ${files.length} changed file(s)\n\n${problems.join("\n\n")}`,
+  };
+}
+
+function readHookInput() {
+  try {
+    const text = readFileSync(0, "utf8");
+    return text.trim() ? JSON.parse(text) : {};
+  } catch {
+    return {};
+  }
+}
+
+let result;
+try {
+  result = check();
+} catch (error) {
+  result = { ok: false, summary: `style: could not run\n${error.message}` };
+}
+
+if (!hookMode) {
+  (result.ok ? console.log : console.error)(result.summary);
+  process.exit(result.ok ? 0 : 1);
+}
+
+// Hook mode: both Claude Code and Codex accept {"decision":"block","reason":...} on stdout with
+// exit 0 as "continue the turn with this reason". stop_hook_active is true when the agent is
+// already continuing because of a Stop hook; block only once so a persistent failure cannot loop.
+const input = readHookInput();
+if (result.ok) process.exit(0);
+const reason = result.summary.slice(0, maxReasonLength);
+const output = input.stop_hook_active
+  ? {
+      systemMessage: `Style check still failing after one retry; not blocking again. Run: npm run style\n${reason}`,
+    }
+  : {
+      decision: "block",
+      reason: `Fix these style problems in changed files, then finish. Do not reformat unrelated files.\n\n${reason}`,
+    };
+process.stdout.write(`${JSON.stringify(output)}\n`);
+process.exit(0);
