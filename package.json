@@ -12,7 +12,11 @@
     "format": "oxfmt",
     "test:unit": "vitest run",
     "test:ui": "playwright test",
-    "test:ui:install": "playwright install chromium webkit"
+    "test:ui:install": "playwright install chromium webkit",
+    "data:import": "node scripts/data/import.ts",
+    "data:sync-ios": "node scripts/data/sync-ios.ts",
+    "data:verify": "node scripts/data/verify-ios.ts",
+    "data:check-fixture": "python3 -I fixtures/ranking/compute_expected.py --check"
   },
   "dependencies": {
     "react": "19.3.1",
@@ -26,6 +30,8 @@
     "@vitejs/plugin-react": "6.2.1",
     "oxfmt": "0.77.0",
     "oxlint": "1.92.0",
+    "pbf": "5.1.2",
+    "polylabel": "2.1.0",
     "typescript": "7.0.2",
     "vite": "8.3.6",
     "vitest": "5.1.0"

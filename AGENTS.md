@@ -1,8 +1,10 @@
 # Nearby pharmacies web
 
-React, TypeScript and Vite shell for the nearest-pharmacy web app. Task 1 scope only: a localized
-heading and one illustrative `0.4 km` straight-line distance. There is no map, geocoder or pharmacy
-data yet. Product decisions live outside this repo in the planning `PLAN.md`.
+React, TypeScript and Vite shell for the nearest-pharmacy web app. The page shows a localized
+heading and one illustrative `1.7 km` straight-line distance. The repo also holds the OSM data
+importer, the bundled pharmacy snapshot in `src/data/`, the ranking code in `src/ranking/` and the
+shared ranking fixture in `fixtures/ranking/`, which is also used by the iOS app. There is no map
+or geocoder yet. Product decisions live outside this repo in the planning `PLAN.md`.
 
 Run every command from the repository root. Use Node 22.12 or later in the 22 series, Node 24, or
 Node 26+. `package.json` pins pnpm 12.21.0. Install dependencies from `pnpm-lock.yaml`.
@@ -31,7 +33,7 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  2 passed (2)` and `Tests  15 passed (15)`                                                             |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  5 passed (5)` and `Tests  96 passed (96)`                                                             |
 | UI launch smoke (Playwright Test)    | `pnpm run test:ui`                  | `4 passed`: English fallback and Finnish on `desktop-chromium` and `narrow-webkit`                                 |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
@@ -48,7 +50,8 @@ with `pnpm exec playwright show-report`.
 `src/i18n/locale.ts` walks `navigator.languages` in order and picks the first entry whose language
 is `fi` or `en`, so `fi-FI` and `en-GB` match. Anything else falls back to English. The app sets
 `<html lang>` and the page title to the chosen locale and formats the distance with
-`Intl.NumberFormat` for it: `0.4 km straight line` in English, `0,4 km linnuntietä` in Finnish.
+`Intl.NumberFormat` for it: `1.7 km straight line` in English, `1,7 km linnuntietä` in Finnish
+(`formatDistance` in `src/i18n/distance.ts`, rounding as in the design spec and the fixture).
 Messages live in `src/locales/en.json` and `src/locales/fi.json`; a unit test keeps their keys in
 sync.
 
@@ -56,19 +59,48 @@ sync.
 
 1. Start `pnpm run dev` as a background process and wait for `Local: http://127.0.0.1:5173/`.
 2. Open `http://127.0.0.1:5173/` in the T3 shared browser and take a snapshot. Expect a level-one
-   heading and the caption "Example distance" above `0.4 km straight line`
+   heading and the caption "Example distance" above `1.7 km straight line`
    for an English or unsupported browser language.
 3. The shared browser uses its own language list, so check it with `navigator.languages` in the
    page before judging the locale. Both locales are covered deterministically by
    `pnpm run test:ui`.
 4. Resize to a narrow width (for example 390 px) to check the narrow layout, then stop the dev server.
 
+## Data commands
+
+The data scripts run TypeScript directly with Node (type stripping), which needs Node 22.18+, 24
+or 26. Formats, reproducibility and licence are described in
+[`docs/data/README.md`](docs/data/README.md).
+
+| Purpose                                | Command                                                          | Expected result                                                                |
+| -------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Import a PBF extract                   | `pnpm run data:import -- --input <file.osm.pbf> --region fi`     | `data:import: wrote N pharmacies and M places to src/data/ (osm-pbf, ...)`     |
+| Interim import from an Overpass answer | `pnpm run data:import -- --overpass <overpass.json> --region fi` | `data:import: wrote N pharmacies to src/data/ (overpass-interim, ...)`         |
+| Copy data and fixture to the iOS repo  | `pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios`  | `copied ...` per file, then `data:verify: N file(s) match`                     |
+| Check the iOS copies                   | `pnpm run data:verify -- --ios-repo ../nearby-pharmacies-ios`    | `data:verify: N file(s) match`, exit 0; `missing:`/`differs:` lines and exit 1 |
+| Re-check the fixture in Python         | `pnpm run data:check-fixture`                                    | `fixture OK: 3 origins, 19 display cases`                                      |
+
+The checked-in data comes from the Geofabrik Finland extract with OSM data from
+2026-11-21T21:20:51Z: 784 pharmacies and 4,675 places. To refresh it, download the extract (about
+742 MB) and run the importer. It reads the file three times and takes a few minutes:
+
+```sh
+curl -L -o /tmp/finland-latest.osm.pbf https://download.geofabrik.de/europe/finland-latest.osm.pbf
+pnpm run data:import -- --input /tmp/finland-latest.osm.pbf --region fi
+pnpm run data:sync-ios -- --ios-repo ../nearby-pharmacies-ios
+```
+
+The sync writes `NearbyPharmacies/Resources/Data/` and `NearbyPharmaciesTests/Fixtures/` in the
+iOS repo. Commit both repos together. Regenerate the fixture's expected values only on purpose:
+`python3 -I fixtures/ranking/compute_expected.py --write`, then
+`pnpm run format ./fixtures/ranking/ranking-v1.json`.
+
 ## Agent stop hook
 
 `scripts/style-check.mjs` checks tracked files with staged or unstaged changes plus untracked files
-that Git does not ignore. It skips deleted files, symlinks, `pnpm-lock.yaml` and unsupported
-extensions. Oxlint (`--deny-warnings`) runs on JavaScript and TypeScript files; Oxfmt runs in
-`--list-different` mode on those plus JSON, CSS, HTML, Markdown and YAML. It never rewrites files.
+that Git does not ignore. It skips deleted files, symlinks, `pnpm-lock.yaml`, the generated
+`src/data/*.json` files and unsupported extensions. Oxlint (`--deny-warnings`) runs on JavaScript
+and TypeScript files; Oxfmt runs in `--list-different` mode on those plus JSON, CSS, HTML, Markdown and YAML. It never rewrites files.
 Each failure names the file, the rule or formatting problem and the `pnpm run format ...` fix.
 
 Run it directly:
@@ -102,8 +134,8 @@ clarity, as in `test(locale): cover English fallback`.
 
 ## Limitations
 
-- The page shows one illustrative distance only. Pharmacy data, ranking, maps and search start in
-  later tasks.
+- The page shows one illustrative distance only. It does not list pharmacies yet, and maps and
+  search start in later tasks.
 - Dependency and Playwright browser downloads require network access. The UI suite starts a local
   server on port 4317. If the agent sandbox blocks network access or that listener, run the affected
   command outside the sandbox with approval.

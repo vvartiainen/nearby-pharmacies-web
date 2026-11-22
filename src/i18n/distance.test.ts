@@ -1,18 +1,39 @@
 import { describe, expect, it } from "vitest";
-import { formatKilometres } from "./distance";
+import { formatDistance, formatStraightLine } from "./distance";
 
 // Intl may separate number and unit with a no-break space; normalise it for readable expectations.
-const format = (kilometres: number, locale: "en" | "fi") =>
-  formatKilometres(kilometres, locale).replace(/ /g, " ");
+const normalize = (text: string) => text.replace(/[  ]/g, " ");
+const format = (meters: number, locale: "en" | "fi") => normalize(formatDistance(meters, locale));
 
-describe("formatKilometres", () => {
+describe("formatDistance", () => {
   it.each([
-    { kilometres: 0.4, locale: "en", expected: "0.4 km" },
-    { kilometres: 0.4, locale: "fi", expected: "0,4 km" },
-    { kilometres: 0, locale: "fi", expected: "0,0 km" },
-    { kilometres: 2.44, locale: "en", expected: "2.4 km" },
-    { kilometres: 12.36, locale: "fi", expected: "12,4 km" },
-  ] as const)("formats $kilometres km in $locale", ({ kilometres, locale, expected }) => {
-    expect(format(kilometres, locale)).toBe(expected);
+    { meters: 0, en: "0 m", fi: "0 m" },
+    { meters: 50.4, en: "50 m", fi: "50 m" },
+    { meters: 295.96, en: "300 m", fi: "300 m" },
+    { meters: 296.05, en: "300 m", fi: "300 m" },
+    { meters: 994.9, en: "990 m", fi: "990 m" },
+    { meters: 995, en: "1.0 km", fi: "1,0 km" },
+    { meters: 999.9, en: "1.0 km", fi: "1,0 km" },
+    { meters: 1000, en: "1.0 km", fi: "1,0 km" },
+    { meters: 1749, en: "1.7 km", fi: "1,7 km" },
+    { meters: 9949.9, en: "9.9 km", fi: "9,9 km" },
+    { meters: 9950, en: "10 km", fi: "10 km" },
+    { meters: 10_000, en: "10 km", fi: "10 km" },
+    { meters: 140_534.6, en: "141 km", fi: "141 km" },
+    { meters: 1_234_000, en: "1,234 km", fi: "1 234 km" },
+  ])("formats $meters m as $en and $fi", ({ meters, en, fi }) => {
+    expect(format(meters, "en")).toBe(en);
+    expect(format(meters, "fi")).toBe(fi);
+  });
+
+  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])("rejects %s", (meters) => {
+    expect(() => formatDistance(meters, "en")).toThrow(RangeError);
+  });
+});
+
+describe("formatStraightLine", () => {
+  it("uses the localized straight-line message", () => {
+    expect(normalize(formatStraightLine(1700, "en"))).toBe("1.7 km straight line");
+    expect(normalize(formatStraightLine(1700, "fi"))).toBe("1,7 km linnuntietä");
   });
 });

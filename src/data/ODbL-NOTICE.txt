@@ -1,0 +1,8 @@
+Pharmacy and place data © OpenStreetMap contributors, data available under the Open Database License (ODbL) v1.0.
+https://www.openstreetmap.org/copyright
+https://opendatacommons.org/licenses/odbl/1-0/
+
+The files pharmacies.*.json and places.*.json are a Derived Database of OpenStreetMap, produced
+by scripts/data/import.ts in the nearby-pharmacies-web repository. They are made available under
+the ODbL. The manifest.*.json file names the source extract, its replication timestamp and
+SHA-256, so the same snapshot can be reproduced from the same input.

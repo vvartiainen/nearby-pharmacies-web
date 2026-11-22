@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "region": "fi",
+  "kind": "osm-pbf",
+  "interim": false,
+  "notes": [
+    "Built from an OSM PBF regional extract. Areas use the bounding-box centre for distance and an interior point (pin) for the map.",
+    "Villages get a municipality when a municipality boundary contains them; municipalities are listed with their admin centre or an interior point."
+  ],
+  "source": {
+    "url": "https://download.geofabrik.de/europe/finland-latest.osm.pbf",
+    "filename": "finland-latest.osm.pbf",
+    "sha256": "8f152ead8a7605f3b616908f42910571ca8e8dc07bce456fddf35fd0b143e080",
+    "bytes": 778335240,
+    "dataTimestamp": "2026-11-21T21:20:51Z",
+    "replicationSequence": 4978
+  },
+  "generatedAt": "2026-11-21T21:20:51Z",
+  "generatedAtFrom": "source data timestamp",
+  "importer": {
+    "script": "scripts/data/import.ts",
+    "version": "1.0.0"
+  },
+  "licence": {
+    "name": "ODbL-1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "url": "https://www.openstreetmap.org/copyright",
+    "notice": "ODbL-NOTICE.txt"
+  },
+  "regionFilter": {
+    "method": "country boundary",
+    "relation": "relation/54224"
+  },
+  "ranking": {
+    "formula": "haversine",
+    "earthRadiusMeters": 6371008.8,
+    "tieBreak": "id, UTF-16 code-unit order",
+    "fixture": "fixtures/ranking/ranking-v1.json"
+  },
+  "files": {
+    "pharmacies": {
+      "path": "pharmacies.fi.json",
+      "sha256": "684b1ba480a9627f1884d0a7710f644f43f46acd573b054480f8a33e1d435a7b",
+      "bytes": 231215,
+      "records": 784
+    },
+    "places": {
+      "path": "places.fi.json",
+      "sha256": "cd8cbc0691f1fdcaa8c3692a64e6059ffd6e679240c20a0d838137ba17fba353",
+      "bytes": 568869,
+      "records": 4675
+    },
+    "notice": {
+      "path": "ODbL-NOTICE.txt",
+      "sha256": "8463b1206516ba80989033d365ece950bdc1bc1a78c5e12d5e765dfbd7cdaeae",
+      "bytes": 556
+    }
+  },
+  "counts": {
+    "features": 788,
+    "nodes": 752,
+    "ways": 31,
+    "relations": 3,
+    "outsideRegion": 2,
+    "droppedDuplicates": 2,
+    "pharmacies": 784,
+    "places": 4675,
+    "municipalitiesWithoutGeometry": 7
+  },
+  "droppedDuplicates": [
+    {
+      "id": "node/12976930478",
+      "keptId": "node/11771777459",
+      "reason": "within-50m",
+      "distanceMeters": 7.3
+    },
+    {
+      "id": "node/13959444245",
+      "keptId": "node/249355455",
+      "reason": "within-50m",
+      "distanceMeters": 33.4
+    }
+  ],
+  "sameNamePairs": [
+    {
+      "name": "Kemijärven Apteekki",
+      "ids": [
+        "node/10200253121",
+        "node/4019561444"
+      ],
+      "distanceMeters": 391.8
+    },
+    {
+      "name": "Järvenpään Lähiapteekki",
+      "ids": [
+        "node/14110808433",
+        "node/285492535"
+      ],
+      "distanceMeters": 634.8
+    }
+  ],
+  "outsideRegion": [
+    "node/1399633329",
+    "node/2611201781"
+  ],
+  "warnings": []
+}

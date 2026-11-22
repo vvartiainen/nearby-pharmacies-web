@@ -1,0 +1,564 @@
+{
+  "schemaVersion": 1,
+  "description": "Shared ranking fixture for web (Vitest) and iOS (Swift Testing). Each origin ranks every pharmacy in this file.",
+  "contract": {
+    "distance": "Haversine great-circle distance on a sphere: d = 2 R asin(sqrt(sin^2(dLat/2) + cos(lat1) cos(lat2) sin^2(dLon/2))), angles in radians = degrees * pi / 180.",
+    "earthRadiusMeters": 6371008.8,
+    "order": "Ascending unrounded distance; exact ties by id in plain UTF-16 code-unit order (so node/10 sorts before node/9).",
+    "display": "Under 1 km: nearest 10 m. 1 km to under 10 km: nearest 0.1 km with one decimal. 10 km and over: nearest 1 km. Round half up on the unrounded metres; a value that rounds up to 1000 m is shown as 1.0 km and one that rounds up to 10.0 km as 10 km. Numbers use the locale's separators (en 1,234.5; fi 1 234,5).",
+    "labels": "Row label is the en message '{distance} straight line' or the fi message '{distance} linnuntietä'.",
+    "labelComparison": "Before comparing, replace U+00A0 and U+202F with U+0020; formatters differ in which space they use."
+  },
+  "computedWith": "Expected distances, order and labels were computed by fixtures/ranking/compute_expected.py (Python 3 standard library only, written separately from the TypeScript code). Check with: pnpm run data:check-fixture",
+  "distanceToleranceMeters": 0.001,
+  "pharmacies": [
+    {
+      "id": "node/1369465553",
+      "name": "Steissin Apteekki",
+      "lat": 60.1717338,
+      "lon": 24.940702,
+      "address": {
+        "street": "Elielinaukio",
+        "housenumber": "3",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "Mo-Fr 07:30-18:00; Sa 10:00-16:00; Su off"
+    },
+    {
+      "id": "node/11771777459",
+      "name": "Apteekki CityCenter",
+      "lat": 60.1700011,
+      "lon": 24.9416154,
+      "openingHours": "Mo-Fr 08:00-19:00; Sa 10:00-17:00; Su off",
+      "note": "Real record without address."
+    },
+    {
+      "id": "node/1369465698",
+      "name": "Yliopiston apteekki",
+      "lat": 60.1695749,
+      "lon": 24.939536,
+      "address": {
+        "street": "Mannerheimintie",
+        "housenumber": "5",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "08:00-24:00",
+      "note": "Same label as node/4727972444 from Helsinki Central (300 m), but 0.09 m nearer."
+    },
+    {
+      "id": "node/4727972444",
+      "name": "Kluuvin apteekki",
+      "lat": 60.1696685,
+      "lon": 24.943445,
+      "address": {
+        "street": "Keskuskatu",
+        "housenumber": "7",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "Mo-Fr 08:00-20:00; Sa 11:00-17:00"
+    },
+    {
+      "id": "node/6049453002",
+      "name": "Erottajan Apteekki",
+      "lat": 60.1680374,
+      "lon": 24.9423205,
+      "address": {
+        "street": "Mannerheimintie",
+        "housenumber": "1",
+        "postcode": "00100",
+        "city": "Helsinki"
+      },
+      "openingHours": "Mo-Fr 10:00-20:00; Sa 10:00-19:00; Su 12:00-18:00"
+    },
+    {
+      "id": "way/402056943",
+      "name": "Kuusankosken Ykkösapteekki",
+      "lat": 60.9073544,
+      "lon": 26.6263934,
+      "address": {
+        "street": "Kauppakatu",
+        "housenumber": "3",
+        "postcode": "45700",
+        "city": "Kuusankoski"
+      },
+      "note": "Real area record (bbox centre) without opening hours."
+    },
+    {
+      "id": "node/12785670397",
+      "name": "Vaara-Karjalan apteekki (Heinävaaran palvelupiste)",
+      "lat": 62.5586278,
+      "lon": 30.1762239,
+      "address": {
+        "street": "Joensuuväylä",
+        "housenumber": "911",
+        "postcode": "82110",
+        "city": "Heinävaara"
+      },
+      "note": "Real record with the longest name and no opening hours."
+    },
+    {
+      "id": "node/5062474709",
+      "name": "Ivalon apteekki",
+      "lat": 68.6568793,
+      "lon": 27.5391982,
+      "address": {
+        "street": "Ivalontie",
+        "housenumber": "10",
+        "postcode": "99800",
+        "city": "Ivalo"
+      },
+      "openingHours": "Mo-Fr 09:00-17:00; Sa 10:00-14:00",
+      "note": "Nearest Finnish pharmacy from Utsjoki, over 10 km."
+    },
+    {
+      "id": "node/9",
+      "name": "Synthetic East",
+      "lat": 61,
+      "lon": 25.0078125,
+      "note": "Synthetic. Mirror of node/10 about the synthetic origin's meridian: exactly the same haversine distance. Coordinates are exact binary fractions."
+    },
+    {
+      "id": "node/10",
+      "name": "Synthetic West",
+      "lat": 61,
+      "lon": 24.9921875,
+      "openingHours": "Mo-Su 00:00-24:00",
+      "note": "Synthetic. Exact tie with node/9 and way/3; sorts first by code units."
+    },
+    {
+      "id": "way/3",
+      "name": "Synthetic Same Spot",
+      "lat": 61,
+      "lon": 25.0078125,
+      "note": "Synthetic. Same point as node/9: exact tie, sorts after the node IDs."
+    },
+    {
+      "id": "node/7",
+      "lat": 61,
+      "lon": 25,
+      "note": "Synthetic. No name, address or opening hours; exactly at the synthetic origin (zero distance)."
+    }
+  ],
+  "origins": [
+    {
+      "id": "helsinki-central",
+      "name": "Helsinki Central Railway Station",
+      "osmId": "node/25474663",
+      "lat": 60.1720965,
+      "lon": 24.9412486,
+      "note": "Default origin. Yliopiston (295.96 m) and Kluuvin (296.05 m) both show 300 m; order comes from the unrounded distance.",
+      "expected": [
+        {
+          "id": "node/1369465553",
+          "distanceMeters": 50.403293,
+          "label": {
+            "en": "50 m straight line",
+            "fi": "50 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/11771777459",
+          "distanceMeters": 233.879747,
+          "label": {
+            "en": "230 m straight line",
+            "fi": "230 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/1369465698",
+          "distanceMeters": 295.957687,
+          "label": {
+            "en": "300 m straight line",
+            "fi": "300 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/4727972444",
+          "distanceMeters": 296.054442,
+          "label": {
+            "en": "300 m straight line",
+            "fi": "300 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/6049453002",
+          "distanceMeters": 455.229274,
+          "label": {
+            "en": "460 m straight line",
+            "fi": "460 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/10",
+          "distanceMeters": 92100.807295,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/7",
+          "distanceMeters": 92114.677801,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/9",
+          "distanceMeters": 92130.521555,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "way/3",
+          "distanceMeters": 92130.521555,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "way/402056943",
+          "distanceMeters": 123188.791738,
+          "label": {
+            "en": "123 km straight line",
+            "fi": "123 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/12785670397",
+          "distanceMeters": 384801.846306,
+          "label": {
+            "en": "385 km straight line",
+            "fi": "385 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/5062474709",
+          "distanceMeters": 951466.540305,
+          "label": {
+            "en": "951 km straight line",
+            "fi": "951 km linnuntietä"
+          }
+        }
+      ]
+    },
+    {
+      "id": "synthetic-tie",
+      "name": "Synthetic origin",
+      "lat": 61,
+      "lon": 25,
+      "note": "Zero distance (node/7) and a three-way exact tie (node/10, node/9, way/3).",
+      "expected": [
+        {
+          "id": "node/7",
+          "distanceMeters": 0.0,
+          "label": {
+            "en": "0 m straight line",
+            "fi": "0 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/10",
+          "distanceMeters": 421.159723,
+          "label": {
+            "en": "420 m straight line",
+            "fi": "420 m linnuntietä"
+          }
+        },
+        {
+          "id": "node/9",
+          "distanceMeters": 421.159723,
+          "label": {
+            "en": "420 m straight line",
+            "fi": "420 m linnuntietä"
+          }
+        },
+        {
+          "id": "way/3",
+          "distanceMeters": 421.159723,
+          "label": {
+            "en": "420 m straight line",
+            "fi": "420 m linnuntietä"
+          }
+        },
+        {
+          "id": "way/402056943",
+          "distanceMeters": 88404.11664,
+          "label": {
+            "en": "88 km straight line",
+            "fi": "88 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/1369465553",
+          "distanceMeters": 92156.02829,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/11771777459",
+          "distanceMeters": 92346.844872,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/4727972444",
+          "distanceMeters": 92380.412966,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/1369465698",
+          "distanceMeters": 92398.196569,
+          "label": {
+            "en": "92 km straight line",
+            "fi": "92 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/6049453002",
+          "distanceMeters": 92563.75386,
+          "label": {
+            "en": "93 km straight line",
+            "fi": "93 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/12785670397",
+          "distanceMeters": 322524.304268,
+          "label": {
+            "en": "323 km straight line",
+            "fi": "323 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/5062474709",
+          "distanceMeters": 859651.537774,
+          "label": {
+            "en": "860 km straight line",
+            "fi": "860 km linnuntietä"
+          }
+        }
+      ]
+    },
+    {
+      "id": "utsjoki",
+      "name": "Utsjoki",
+      "osmId": "node/60070999",
+      "lat": 69.907601,
+      "lon": 27.0252458,
+      "note": "Rural origin: the nearest result is over 100 km away and shown in whole kilometres.",
+      "expected": [
+        {
+          "id": "node/5062474709",
+          "distanceMeters": 140534.640801,
+          "label": {
+            "en": "141 km straight line",
+            "fi": "141 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/12785670397",
+          "distanceMeters": 829005.72558,
+          "label": {
+            "en": "829 km straight line",
+            "fi": "829 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/9",
+          "distanceMeters": 994719.992298,
+          "label": {
+            "en": "995 km straight line",
+            "fi": "995 km linnuntietä"
+          }
+        },
+        {
+          "id": "way/3",
+          "distanceMeters": 994719.992298,
+          "label": {
+            "en": "995 km straight line",
+            "fi": "995 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/7",
+          "distanceMeters": 994752.81019,
+          "label": {
+            "en": "995 km straight line",
+            "fi": "995 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/10",
+          "distanceMeters": 994785.753791,
+          "label": {
+            "en": "995 km straight line",
+            "fi": "995 km linnuntietä"
+          }
+        },
+        {
+          "id": "way/402056943",
+          "distanceMeters": 1000947.952493,
+          "label": {
+            "en": "1,001 km straight line",
+            "fi": "1 001 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/1369465553",
+          "distanceMeters": 1086832.423545,
+          "label": {
+            "en": "1,087 km straight line",
+            "fi": "1 087 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/11771777459",
+          "distanceMeters": 1087020.851438,
+          "label": {
+            "en": "1,087 km straight line",
+            "fi": "1 087 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/4727972444",
+          "distanceMeters": 1087050.293819,
+          "label": {
+            "en": "1,087 km straight line",
+            "fi": "1 087 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/1369465698",
+          "distanceMeters": 1087076.579034,
+          "label": {
+            "en": "1,087 km straight line",
+            "fi": "1 087 km linnuntietä"
+          }
+        },
+        {
+          "id": "node/6049453002",
+          "distanceMeters": 1087235.745689,
+          "label": {
+            "en": "1,087 km straight line",
+            "fi": "1 087 km linnuntietä"
+          }
+        }
+      ]
+    }
+  ],
+  "displayCases": [
+    {
+      "meters": 0,
+      "en": "0 m",
+      "fi": "0 m"
+    },
+    {
+      "meters": 4.9,
+      "en": "0 m",
+      "fi": "0 m"
+    },
+    {
+      "meters": 5,
+      "en": "10 m",
+      "fi": "10 m"
+    },
+    {
+      "meters": 50.4,
+      "en": "50 m",
+      "fi": "50 m"
+    },
+    {
+      "meters": 994.9,
+      "en": "990 m",
+      "fi": "990 m"
+    },
+    {
+      "meters": 995,
+      "note": "Rounds up to 1000 m, so it is shown in the kilometre band.",
+      "en": "1.0 km",
+      "fi": "1,0 km"
+    },
+    {
+      "meters": 999.9,
+      "en": "1.0 km",
+      "fi": "1,0 km"
+    },
+    {
+      "meters": 1000,
+      "en": "1.0 km",
+      "fi": "1,0 km"
+    },
+    {
+      "meters": 1049.9,
+      "en": "1.0 km",
+      "fi": "1,0 km"
+    },
+    {
+      "meters": 1050,
+      "en": "1.1 km",
+      "fi": "1,1 km"
+    },
+    {
+      "meters": 1749,
+      "en": "1.7 km",
+      "fi": "1,7 km"
+    },
+    {
+      "meters": 9949.9,
+      "en": "9.9 km",
+      "fi": "9,9 km"
+    },
+    {
+      "meters": 9950,
+      "note": "Rounds up to 10.0 km, so it is shown in whole kilometres.",
+      "en": "10 km",
+      "fi": "10 km"
+    },
+    {
+      "meters": 9999.9,
+      "en": "10 km",
+      "fi": "10 km"
+    },
+    {
+      "meters": 10000,
+      "en": "10 km",
+      "fi": "10 km"
+    },
+    {
+      "meters": 10499.9,
+      "en": "10 km",
+      "fi": "10 km"
+    },
+    {
+      "meters": 10500,
+      "en": "11 km",
+      "fi": "11 km"
+    },
+    {
+      "meters": 140534.6,
+      "en": "141 km",
+      "fi": "141 km"
+    },
+    {
+      "meters": 1234000,
+      "note": "Grouping separator: en comma, fi space.",
+      "en": "1,234 km",
+      "fi": "1 234 km"
+    }
+  ]
+}

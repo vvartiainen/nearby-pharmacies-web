@@ -1,8 +1,9 @@
-import { formatKilometres } from "./i18n/distance";
+import { formatStraightLine } from "./i18n/distance";
 import type { SupportedLocale } from "./i18n/locale";
-import { interpolate, messagesFor } from "./i18n/messages";
+import { messagesFor } from "./i18n/messages";
 
-const sampleKilometres = 0.4;
+/** Illustrative distance from the design spec's "Distance format" examples. */
+const sampleMeters = 1700;
 
 export function App({ locale }: { locale: SupportedLocale }) {
   const messages = messagesFor(locale);
@@ -11,11 +12,7 @@ export function App({ locale }: { locale: SupportedLocale }) {
       <h1>{messages.heading}</h1>
       <figure>
         <figcaption>{messages.sampleCaption}</figcaption>
-        <p data-testid="sample-distance">
-          {interpolate(messages.straightLine, {
-            distance: formatKilometres(sampleKilometres, locale),
-          })}
-        </p>
+        <p data-testid="sample-distance">{formatStraightLine(sampleMeters, locale)}</p>
       </figure>
     </main>
   );
