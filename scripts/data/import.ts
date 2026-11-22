@@ -61,6 +61,7 @@ const source = sha256File(sourcePath);
 let manifestInput: Omit<ManifestInput, "files">;
 let snapshotText: string;
 let placesText: string | undefined;
+let coverageText: string | undefined;
 let pharmacyCount: number;
 let placeCount = 0;
 
@@ -74,6 +75,12 @@ if (values.input) {
   const { pharmacies, dropped, sameNamePairs } = buildPharmacies(result.features);
   snapshotText = serializeSnapshot(region, pharmacies);
   placesText = serializePlaces(region, result.places);
+  if (result.coverage) {
+    coverageText =
+      JSON.stringify(result.coverage, (_key, value: unknown) =>
+        typeof value === "number" ? Number(value.toFixed(5)) : value,
+      ) + "\n";
+  }
   pharmacyCount = pharmacies.length;
   placeCount = result.places.length;
   const kinds = (prefix: string) => result.features.filter((f) => f.id.startsWith(prefix)).length;
@@ -176,6 +183,11 @@ if (placesText) {
   rmSync(join(outDir, names.places));
   log(`removed stale ${names.places}: this snapshot has no place index`);
 }
+// Coverage is a derived web asset. The shared snapshot and manifest stay compatible with iOS.
+const coveragePath = join(outDir, `coverage.${region}.json`);
+if (coverageText) writeFileSync(coveragePath, coverageText);
+else if (existsSync(coveragePath)) rmSync(coveragePath);
+
 writeFileSync(
   join(outDir, names.manifest),
   serializeManifest({ ...manifestInput, files }, process.env.SOURCE_DATE_EPOCH),

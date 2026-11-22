@@ -8,10 +8,17 @@ export const resultLimit = 20;
 /** OSM node/25474663, Helsinki Central Railway Station, as in the ranking fixture. */
 export const defaultOrigin: Origin = { kind: "default", lat: 60.1720965, lon: 24.9412486 };
 
-/** The active starting point. Checkpoint 2 adds search matches, device location and dropped pins. */
-export interface Origin extends LatLon {
-  readonly kind: "default";
-}
+/** The active starting point and the source of its label. */
+export type Origin = LatLon &
+  (
+    | { readonly kind: "default" | "device" | "pin" }
+    | {
+        readonly kind: "search";
+        readonly label: string;
+        readonly title: string;
+        readonly context: string;
+      }
+  );
 
 export type SelectionSource = "row" | "pin";
 

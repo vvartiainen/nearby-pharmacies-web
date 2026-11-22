@@ -1,4 +1,5 @@
 import {
+  circleMarker,
   control,
   divIcon,
   latLngBounds,
@@ -8,12 +9,14 @@ import {
   polyline,
   tileLayer,
   type ControlPosition,
+  type LatLngBounds,
   type LatLngExpression,
+  type LeafletMouseEvent,
   type Map as LeafletMap,
   type Marker,
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { LatLon } from "../ranking/haversine";
 import { attributionHtml, tileSettings } from "./config";
 
@@ -43,6 +46,9 @@ export interface PharmacyMapProps {
   /** CSS pixels of the map covered at its edges: the narrow sheet below, the desktop card left. */
   readonly obscured: () => ObscuredEdges;
   readonly onSelect: (id: string) => void;
+  readonly onPlaceOrigin: (point: LatLon) => void;
+  readonly searchFromHere: string;
+  readonly keepViewport: boolean;
 }
 
 const fitMaxZoom = 17;
@@ -51,14 +57,19 @@ const edgePadding = 32;
 const pinOverhangTop = 54;
 const pinHalfWidth = 21;
 
-/** Padding that keeps whole pins, not only their tips, inside the visible part of the map. */
-function viewPadding({ left, bottom }: ObscuredEdges) {
+/** Leave room around the markers without using up the visible map on a short screen. */
+function viewPadding({ left, bottom }: ObscuredEdges, { x, y }: { x: number; y: number }) {
+  const horizontalMargin = Math.max(0, Math.min(edgePadding, (x - left - pinHalfWidth * 2) / 4));
+  const verticalMargin = Math.max(0, Math.min(edgePadding, (y - bottom - pinOverhangTop - 16) / 4));
   return {
-    paddingTopLeft: [left + edgePadding + pinHalfWidth, edgePadding + pinOverhangTop] as [
+    paddingTopLeft: [left + horizontalMargin + pinHalfWidth, verticalMargin + pinOverhangTop] as [
       number,
       number,
     ],
-    paddingBottomRight: [edgePadding + pinHalfWidth, edgePadding + bottom] as [number, number],
+    paddingBottomRight: [horizontalMargin + pinHalfWidth, bottom + verticalMargin + 16] as [
+      number,
+      number,
+    ],
   };
 }
 
@@ -90,8 +101,40 @@ export function PharmacyMap(props: PharmacyMapProps) {
   const containerRef = useRef<HTMLElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markersRef = useRef(new Map<string, Marker>());
+  const automaticMove = useRef(false);
+  const [mapPick, setMapPick] = useState<{
+    point: LatLon;
+    origin: LatLon;
+    selectionCount: number;
+  } | null>(null);
+  const candidate =
+    mapPick?.origin === origin && mapPick.selectionCount === selectionCount ? mapPick.point : null;
   const select = useEffectEvent((id: string) => props.onSelect(id));
-  const obscured = useEffectEvent(() => props.obscured());
+  const keepViewport = useEffectEvent(() => props.keepViewport);
+  const chooseCandidate = useEffectEvent((point: { lat: number; lng: number }) => {
+    setMapPick({ point: { lat: point.lat, lon: point.lng }, origin, selectionCount });
+  });
+  const candidateAtCentre = useEffectEvent((map: LeafletMap) => {
+    if (automaticMove.current) return;
+    const size = map.getSize();
+    const { left, bottom } = props.obscured();
+    chooseCandidate(
+      map.containerPointToLatLng([(size.x + left) / 2, (size.y - bottom) / 2]).wrap(),
+    );
+  });
+  const fitView = useEffectEvent((map: LeafletMap, bounds: LatLngBounds) => {
+    automaticMove.current = true;
+    try {
+      map.invalidateSize({ animate: false, pan: false });
+      map.fitBounds(bounds, {
+        ...viewPadding(props.obscured(), map.getSize()),
+        maxZoom: fitMaxZoom,
+        animate: false,
+      });
+    } finally {
+      automaticMove.current = false;
+    }
+  });
 
   useEffect(() => {
     const container = containerRef.current!;
@@ -106,7 +149,21 @@ export function PharmacyMap(props: PharmacyMapProps) {
     });
     tileLayer(tileSettings.url, { maxZoom: tileSettings.maxZoom }).addTo(map);
     mapRef.current = map;
+    map.on("moveend", () => candidateAtCentre(map));
+    map.on("contextmenu", (event: LeafletMouseEvent) => {
+      chooseCandidate(event.latlng.wrap());
+    });
+    const resize = new ResizeObserver(() => {
+      automaticMove.current = true;
+      try {
+        map.invalidateSize({ animate: false });
+      } finally {
+        automaticMove.current = false;
+      }
+    });
+    resize.observe(container);
     return () => {
+      resize.disconnect();
       map.remove();
       mapRef.current = null;
     };
@@ -163,12 +220,10 @@ export function PharmacyMap(props: PharmacyMapProps) {
       markers.set(pin.id, pinMarker);
     }
 
-    const bounds = latLngBounds([toLatLng(origin), ...pins.map((pin) => toLatLng(pin.position))]);
-    map.fitBounds(bounds, {
-      ...viewPadding(obscured()),
-      maxZoom: fitMaxZoom,
-      animate: false,
-    });
+    if (!keepViewport()) {
+      const bounds = latLngBounds([toLatLng(origin), ...pins.map((pin) => toLatLng(pin.position))]);
+      fitView(map, bounds);
+    }
 
     return () => {
       originMarker.remove();
@@ -207,24 +262,47 @@ export function PharmacyMap(props: PharmacyMapProps) {
         weight: 3,
       }),
     ]).addTo(map);
-    map.fitBounds(latLngBounds(endpoints), {
-      ...viewPadding(obscured()),
-      maxZoom: fitMaxZoom,
-      animate: false,
-    });
+    fitView(map, latLngBounds(endpoints));
 
     return () => {
       line.remove();
     };
   }, [origin, pins, selectedId, selectionCount]);
 
+  useEffect(() => {
+    if (!candidate) return;
+    const marker = circleMarker(toLatLng(candidate), {
+      className: "map-picker__target",
+      radius: 8,
+      weight: 3,
+      interactive: false,
+    }).addTo(mapRef.current!);
+    return () => {
+      marker.remove();
+    };
+  }, [candidate]);
+
   return (
-    <section
-      ref={containerRef}
-      className="map"
-      data-testid="map"
-      data-has-selection={selectedId !== null ? "" : undefined}
-      aria-label={label}
-    />
+    <>
+      <section
+        ref={containerRef}
+        className="map"
+        data-testid="map"
+        data-has-selection={selectedId !== null ? "" : undefined}
+        aria-label={label}
+      />
+      {candidate ? (
+        <button
+          type="button"
+          className="origin-action map-picker"
+          onClick={() => {
+            props.onPlaceOrigin(candidate);
+            containerRef.current?.focus({ preventScroll: true });
+          }}
+        >
+          {props.searchFromHere}
+        </button>
+      ) : null}
+    </>
   );
 }

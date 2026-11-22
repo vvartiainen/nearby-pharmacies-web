@@ -5,7 +5,7 @@
 //   3. node coordinates for exactly the way nodes found in pass 2.
 // Memory is bounded by the selected features and their geometry, not by the extract size.
 
-import type { Place, PlaceType } from "../../src/data/schema.ts";
+import type { CoverageGeometry, Place, PlaceType } from "../../src/data/schema.ts";
 import type { LatLon } from "../../src/ranking/haversine.ts";
 import { compareIds } from "../../src/ranking/rank.ts";
 import {
@@ -15,10 +15,12 @@ import {
   interiorPoint,
   pointInArea,
   roundCoordinate,
+  simplifyBoundary,
   type BBox,
   type Position,
   type Ring,
 } from "./geometry.ts";
+import { NodeStore } from "./node-store.ts";
 import type { RawFeature } from "./normalize.ts";
 import { readPbf, type PbfHeader, type RelationMember, type Tags } from "./osm-pbf.ts";
 
@@ -39,6 +41,7 @@ export interface PbfImportResult {
   features: RawFeature[];
   places: Place[];
   boundaryId?: string;
+  coverage?: CoverageGeometry;
   outsideRegion: string[];
   municipalitiesWithoutGeometry: number;
   warnings: string[];
@@ -48,58 +51,6 @@ interface PendingRelation {
   id: number;
   tags: Tags;
   members: RelationMember[];
-}
-
-/** Sorted unique node IDs with coordinates filled in pass 3. */
-class NodeStore {
-  ids: Float64Array = new Float64Array(0);
-  lat: Int32Array = new Int32Array(0);
-  lon: Int32Array = new Int32Array(0);
-  found: Uint8Array = new Uint8Array(0);
-  #pending: number[] = [];
-
-  add(id: number) {
-    this.#pending.push(id);
-  }
-
-  freeze() {
-    const sorted = Float64Array.from(this.#pending).toSorted();
-    let count = 0;
-    for (let i = 0; i < sorted.length; i++) {
-      if (i === 0 || sorted[i] !== sorted[i - 1]) sorted[count++] = sorted[i] ?? 0;
-    }
-    this.ids = sorted.slice(0, count);
-    this.lat = new Int32Array(count);
-    this.lon = new Int32Array(count);
-    this.found = new Uint8Array(count);
-    this.#pending = [];
-  }
-
-  indexOf(id: number): number {
-    let low = 0;
-    let high = this.ids.length - 1;
-    while (low <= high) {
-      const mid = (low + high) >> 1;
-      const value = this.ids[mid] ?? 0;
-      if (value === id) return mid;
-      if (value < id) low = mid + 1;
-      else high = mid - 1;
-    }
-    return -1;
-  }
-
-  /** Coordinates in units of 1e-7 degrees, OSM's storage precision. */
-  set(index: number, latNano: number, lonNano: number) {
-    this.lat[index] = Math.round(latNano / 100);
-    this.lon[index] = Math.round(lonNano / 100);
-    this.found[index] = 1;
-  }
-
-  position(id: number): Position | undefined {
-    const index = this.indexOf(id);
-    if (index < 0 || !this.found[index]) return undefined;
-    return [(this.lon[index] ?? 0) / 1e7, (this.lat[index] ?? 0) / 1e7];
-  }
 }
 
 const nanoToDegrees = (nano: number) => roundCoordinate(nano / 1e9);
@@ -167,12 +118,14 @@ export function importPbf(path: string, options: PbfImportOptions): PbfImportRes
   // Pass 2: ways.
   const nodes = new NodeStore();
   const wayRefs = new Map<number, number[]>();
+  const maritimeWays = new Set<number>();
   const pharmacyWays: { id: number; tags: Tags }[] = [];
   readPbf(path, {
-    tagKeys: new Set(["amenity"]),
+    tagKeys: new Set(["amenity", "maritime"]),
     wantWay: (id, tags) => isPharmacy(tags) || neededWays.has(id),
     way(id, refs, tags) {
       wayRefs.set(id, refs);
+      if (tags?.maritime === "yes") maritimeWays.add(id);
       for (const ref of refs) nodes.add(ref);
       if (isPharmacy(tags) && tags) pharmacyWays.push({ id, tags });
     },
@@ -322,8 +275,20 @@ export function importPbf(path: string, options: PbfImportOptions): PbfImportRes
     });
   }
 
+  const coverage =
+    country && regionRings
+      ? {
+          rings: regionRings.map(simplifyBoundary).filter((ring) => ring.length >= 4),
+          landBorders: country.members
+            .filter((member) => member.type === "way" && !maritimeWays.has(member.ref))
+            .map((member) => simplifyBoundary(positionsOf(wayRefs.get(member.ref) ?? [])))
+            .filter((line) => line.length >= 2),
+        }
+      : undefined;
+
   return {
     header,
+    ...(coverage ? { coverage } : {}),
     features: features.filter((f) => !outside.has(f.id)),
     places: places.toSorted((a, b) => compareIds(a.id, b.id)),
     ...(country ? { boundaryId: `relation/${country.id}` } : {}),

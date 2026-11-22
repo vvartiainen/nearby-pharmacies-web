@@ -144,7 +144,7 @@ test("selecting a row zooms in, selects its pin and shows details with hours", a
     "SunClosed",
   ]);
   // Selection never moves the origin.
-  await expect(page.getByTestId("origin")).toContainText(
+  await expect(page.getByTestId("origin")).toHaveValue(
     "Helsinki Central Railway Station (default)",
   );
 
@@ -182,6 +182,11 @@ test("keyboard: Tab reaches a row with a visible focus ring and Enter selects it
   page,
 }, testInfo) => {
   await page.goto("/");
+  await page.getByRole("combobox", { name: "City or street address" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Use my location" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Not now" })).toBeFocused();
   if (!isDesktop(testInfo)) {
     const toggle = page.getByRole("button", { name: "Results", exact: true });
     await page.keyboard.press("Tab");

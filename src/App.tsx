@@ -1,8 +1,16 @@
 import { useCallback, useMemo, useReducer, useRef } from "react";
 import { addressLines, displayName } from "./app/format";
-import { appReducer, initialState, nearestPharmacies, pinPosition } from "./app/state";
+import {
+  appReducer,
+  defaultOrigin,
+  initialState,
+  nearestPharmacies,
+  pinPosition,
+  type Origin,
+} from "./app/state";
 import { useMediaQuery } from "./app/useMediaQuery";
 import { DetailsCard } from "./components/DetailsCard";
+import { OriginControls } from "./components/OriginControls";
 import { PharmacyDetails } from "./components/PharmacyDetails";
 import { ResultRow } from "./components/ResultRow";
 import { pharmacySnapshot } from "./data";
@@ -11,6 +19,9 @@ import type { SupportedLocale } from "./i18n/locale";
 import { interpolate, messagesFor } from "./i18n/messages";
 import { tileSettings } from "./map/config";
 import { PharmacyMap, type MapPin, type ObscuredEdges } from "./map/PharmacyMap";
+import { originCoverage } from "./origin/coverage";
+import { useOriginControls } from "./origin/useOriginControls";
+import type { LatLon } from "./ranking/haversine";
 
 /** Same breakpoint as the desktop layout in styles.css. */
 const desktopQuery = "(min-width: 900px)";
@@ -21,6 +32,15 @@ export function App({ locale }: { locale: SupportedLocale }) {
   const isDesktop = useMediaQuery(desktopQuery);
   const sheetRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLElement>(null);
+
+  const applyOrigin = useCallback((origin: Origin) => dispatch({ type: "setOrigin", origin }), []);
+  const controls = useOriginControls(locale, applyOrigin);
+  const { changeOrigin } = controls;
+  const placePin = useCallback(
+    (point: LatLon) => changeOrigin({ ...point, kind: "pin" }),
+    [changeOrigin],
+  );
+  const coverage = useMemo(() => originCoverage(state.origin), [state.origin]);
 
   // Results depend on the origin only; selection and panning never rerank.
   const results = useMemo(
@@ -70,20 +90,56 @@ export function App({ locale }: { locale: SupportedLocale }) {
   const sheetExpanded = state.sheet === "expanded";
   const showSheetBack = sheetShowsDetails && sheetExpanded;
   const sheetToggleLabel = sheetShowsDetails ? messages.detailsLabel : messages.results;
-  const originLabel = messages.defaultOrigin;
+  const originLabel =
+    state.origin.kind === "search"
+      ? state.origin.label
+      : state.origin.kind === "device"
+        ? messages.deviceOrigin
+        : state.origin.kind === "pin"
+          ? messages.pinOrigin
+          : messages.defaultOrigin;
+  const deviceAddress = state.origin.kind === "device" ? controls.deviceAddress : undefined;
+  const originFieldTitle = deviceAddress
+    ? interpolate(messages.nearDeviceAddress, { address: deviceAddress.street })
+    : state.origin.kind === "search"
+      ? state.origin.title
+      : originLabel;
+  const originFieldContext =
+    deviceAddress?.city ?? (state.origin.kind === "search" ? state.origin.context : "");
+  const originFieldLabel = deviceAddress
+    ? [originFieldTitle, originFieldContext].filter(Boolean).join(", ")
+    : originLabel;
   const count = new Intl.NumberFormat(locale).format(pharmacySnapshot.pharmacies.length);
 
   return (
     <main className="app" data-layout={isDesktop ? "desktop" : "narrow"}>
       <header className="origin-bar">
-        <h1 className="app-title">{messages.title}</h1>
-        <div className="origin" data-testid="origin">
-          <p className="origin__caption">{messages.originCaption}</p>
-          <p className="origin__label">
-            <span className="origin__dot" aria-hidden="true" />
-            {originLabel}
-          </p>
+        <div>
+          <h1 className="app-title">{messages.title}</h1>
+          <p className="app-scope">{interpolate(messages.scopeAndCount, { count })}</p>
         </div>
+        <OriginControls
+          controls={controls}
+          messages={messages}
+          origin={state.origin}
+          originLabel={originFieldLabel}
+          originTitle={originFieldTitle}
+          originContext={originFieldContext}
+        />
+        {coverage === "outside" ? (
+          <div className="origin-coverage">
+            <output>{messages.outsideFinland}</output>
+            <button
+              type="button"
+              className="origin-action"
+              onClick={() => changeOrigin(defaultOrigin)}
+            >
+              {messages.returnToHelsinki}
+            </button>
+          </div>
+        ) : coverage === "border" ? (
+          <output className="origin-coverage">{messages.borderNotice}</output>
+        ) : null}
       </header>
 
       <section
@@ -96,7 +152,6 @@ export function App({ locale }: { locale: SupportedLocale }) {
         {isDesktop ? (
           <div className="results__header">
             <h2 className="results__title">{messages.resultsTitle}</h2>
-            <p className="results__scope">{interpolate(messages.scopeAndCount, { count })}</p>
           </div>
         ) : (
           <div className="results__toolbar">
@@ -177,6 +232,9 @@ export function App({ locale }: { locale: SupportedLocale }) {
           zoomPosition={isDesktop ? "topright" : "topleft"}
           obscured={obscured}
           onSelect={selectPin}
+          onPlaceOrigin={placePin}
+          searchFromHere={messages.searchFromHere}
+          keepViewport={state.origin.kind === "pin" && coverage !== "outside"}
         />
         {showDetails && isDesktop ? (
           <DetailsCard

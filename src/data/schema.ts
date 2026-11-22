@@ -51,3 +51,9 @@ export interface PlaceIndex {
   region: string;
   places: Place[];
 }
+
+/** Simplified national boundary and non-maritime border segments from the OSM extract. */
+export interface CoverageGeometry {
+  readonly rings: readonly (readonly (readonly [lon: number, lat: number])[])[];
+  readonly landBorders: readonly (readonly (readonly [lon: number, lat: number])[])[];
+}

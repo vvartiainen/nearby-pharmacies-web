@@ -100,14 +100,22 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 ### Origin search
 
-- A field labelled "City or street address", a Search button and a "Use my location" button.
-- Above or below the field, the active origin: a caption "Starting point" and its label, for example
-  "Helsinki Central Railway Station (default)", "Your location", "Dropped pin" or the chosen match.
+- A field labelled "City or street address", a Search button and a "Use my location" control.
+- On web, the field shows the current starting point when it is idle. The address or name sits
+  above a smaller, muted locality line when locality details are available. Typing replaces
+  the summary with a search draft. Examples of active origins include "Helsinki Central Railway Station (default)",
+  "Near Rautatienkatu 25, Tampere", "Dropped pin", and the chosen match. A usable device fix
+  immediately updates results. Web resolves a nearby street address from the bundled OSM index
+  and uses "Your location" while the lookup is pending or no usable address is available.
+- On web, the location control is an icon at the right edge of the field. It shows a spinner
+  during a location request and retains its accessible name. On iOS the active origin can appear
+  separately with the caption "Starting point".
 - Submitting runs one geocoder request. There is no autocomplete. While it runs, the button shows a
   busy state and the field stays editable.
-- Matches appear as a list under the field. Each shows street and number, then municipality and
-  country, for example "Kauppakatu 1 · Lahti, Finland". Build labels from address fields, never
-  from the feature name. Choosing a match sets the origin and closes the list.
+- Web shows submitted matches in a dropdown anchored below the field. A named feature or street
+  address is the first line, with neighborhood, municipality, and country as available on the
+  second. Arrow keys and hovering highlight a match. Enter or clicking chooses it, updates the
+  field, and closes the dropdown. Escape closes the dropdown.
 - A short note near the field says that search text is sent to OpenStreetMap's Nominatim service.
 
 ### Pharmacy pin and origin marker
@@ -142,8 +150,9 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 ### Results sheet and list
 
-- Desktop web and iOS show the title "Nearest pharmacies" and the scope "Mapped pharmacies in
-  Finland" with the result count. The narrow web drawer uses a "Results" toggle.
+- Web shows the dataset count below "Pharmacy finder" in the header. The desktop list is titled
+  "Nearest pharmacies", and the narrow web drawer uses a "Results" toggle. On iOS the list pairs
+  "Nearest pharmacies" with the Finland scope and count.
 - Rows in distance order. Selecting a row or a pin selects both and shows its details: name,
   distance, address (or "Address unavailable") and the hours block.
 - Desktop web: the list always stays in the panel. The details open in a card docked over the map's
@@ -185,24 +194,25 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 
 ## States and interactions
 
-| Event                                                           | Origin                                                          | Results                       | Selection     | Map                                                                         | Message                                                                      |
-| --------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------- | ------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| First launch                                                    | Default: Helsinki Central Railway Station                       | Ranked from default           | None          | Fits origin and nearest results                                             | Location prompt after the results show                                       |
-| Location granted, default origin still active                   | Your location                                                   | Reranked                      | Cleared       | Recentres on the fix                                                        | None                                                                         |
-| Location granted after the user chose an origin                 | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                   | None. "Use my location" can apply it later                                   |
-| Location denied or timed out                                    | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                   | "Location unavailable…" notice with search and map hints                     |
-| Search submitted                                                | Unchanged until a match is chosen                               | Unchanged                     | Unchanged     | Unchanged                                                                   | Busy state on the button                                                     |
-| Match chosen                                                    | The match, with its label                                       | Reranked                      | Cleared       | Fits origin and nearest results                                             | None                                                                         |
-| No matches                                                      | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                   | "No places in Finland match…" under the field                                |
-| Geocoder failed or rate-limited                                 | Unchanged; a city query may still match the bundled place index | Unchanged                     | Unchanged     | Unchanged                                                                   | "Address search is unavailable…"                                             |
-| Pin dropped (long press, or right click and "Search from here") | Dropped pin                                                     | Reranked                      | Cleared       | Keeps the viewport                                                          | None                                                                         |
-| Late geocoder response after a pin drop                         | Stays on the dropped pin                                        | Unchanged                     | Unchanged     | Unchanged                                                                   | Response ignored                                                             |
-| Map panned or zoomed                                            | Unchanged                                                       | Unchanged                     | Unchanged     | Moves                                                                       | "Search from here" button appears; pressing it drops a pin at the map centre |
-| Row selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy | Web fits the origin and selected pin and connects them with a straight line | Details shown; the narrow web drawer expands                                 |
-| Pin selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy | Web fits the origin and selected pin and connects them with a straight line | Details shown; the narrow web drawer expands                                 |
-| Origin outside Finland                                          | The chosen origin stays                                         | Nearest pharmacies in Finland | Cleared       | Fits origin and nearest results                                             | "This starting point is outside Finland…" with "Return to Helsinki"          |
-| Origin within about 5 km of a land border                       | As chosen                                                       | As ranked                     | As before     | As before                                                                   | "Pharmacies across the border…" notice                                       |
-| Tiles fail to load                                              | Unchanged                                                       | Unchanged                     | Unchanged     | Blank map, pins still drawn on web                                          | List and search keep working                                                 |
+| Event                                                           | Origin                                                          | Results                       | Selection          | Map                                                                         | Message                                                                      |
+| --------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------- | ------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| First launch                                                    | Default: Helsinki Central Railway Station                       | Ranked from default           | None               | Fits origin and nearest results                                             | Location prompt after the results show                                       |
+| Location granted, default origin still active                   | Your location                                                   | Reranked                      | Cleared            | Recentres on the fix                                                        | None                                                                         |
+| Location granted after the user chose an origin                 | Unchanged                                                       | Unchanged                     | Unchanged          | Unchanged                                                                   | None. "Use my location" can apply it later                                   |
+| Location denied or timed out                                    | Unchanged                                                       | Unchanged                     | Unchanged          | Unchanged                                                                   | "Location unavailable…" notice with search and map hints                     |
+| Search submitted                                                | Unchanged until a match is chosen                               | Unchanged                     | Unchanged          | Unchanged                                                                   | Busy state on the button                                                     |
+| Match chosen                                                    | The match, with its label                                       | Reranked                      | Cleared            | Fits origin and nearest results                                             | None                                                                         |
+| No matches                                                      | Unchanged                                                       | Unchanged                     | Unchanged          | Unchanged                                                                   | "No places in Finland match…" under the field                                |
+| Geocoder failed or rate-limited                                 | Unchanged; a city query may still match the bundled place index | Unchanged                     | Unchanged          | Unchanged                                                                   | "Address search is unavailable…"                                             |
+| Pin dropped (long press, or right click and "Search from here") | Nearby device address (web)                                     | Near {address}                | Lähellä: {address} |
+| Dropped pin                                                     | Reranked                                                        | Cleared                       | Keeps the viewport | None                                                                        |
+| Late geocoder response after a pin drop                         | Stays on the dropped pin                                        | Unchanged                     | Unchanged          | Unchanged                                                                   | Response ignored                                                             |
+| Map panned or zoomed                                            | Unchanged                                                       | Unchanged                     | Unchanged          | Moves                                                                       | "Search from here" button appears; pressing it drops a pin at the map centre |
+| Row selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy      | Web fits the origin and selected pin and connects them with a straight line | Details shown; the narrow web drawer expands                                 |
+| Pin selected                                                    | Unchanged                                                       | Unchanged                     | That pharmacy      | Web fits the origin and selected pin and connects them with a straight line | Details shown; the narrow web drawer expands                                 |
+| Origin outside Finland                                          | The chosen origin stays                                         | Nearest pharmacies in Finland | Cleared            | Fits origin and nearest results                                             | "This starting point is outside Finland…" with "Return to Helsinki"          |
+| Origin within about 5 km of a land border                       | As chosen                                                       | As ranked                     | As before          | As before                                                                   | "Pharmacies across the border…" notice                                       |
+| Tiles fail to load                                              | Unchanged                                                       | Unchanged                     | Unchanged          | Blank map, pins still drawn on web                                          | List and search keep working                                                 |
 
 ## Interface text
 
@@ -211,7 +221,8 @@ never translated. Strings with `{…}` take values.
 
 | Key                     | English                                                                                          | Finnish                                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| App title               | Nearby pharmacies                                                                                | Lähiapteekit                                                                                           |
+| App title (web)         | Pharmacy finder                                                                                  | Apteekkihaku                                                                                           |
+| App title (iOS)         | Nearby pharmacies                                                                                | Lähiapteekit                                                                                           |
 | Search label            | City or street address                                                                           | Kaupunki tai katuosoite                                                                                |
 | Search button           | Search                                                                                           | Hae                                                                                                    |
 | Use my location         | Use my location                                                                                  | Käytä sijaintiani                                                                                      |
@@ -231,7 +242,8 @@ never translated. Strings with `{…}` take values.
 | Location unavailable    | Location unavailable. Search for a city or address, or choose a point on the map.                | Sijainti ei ole käytettävissä. Hae kaupunkia tai osoitetta tai valitse kohta kartalta.                 |
 | Results title           | Nearest pharmacies                                                                               | Lähimmät apteekit                                                                                      |
 | Results toggle (web)    | Results                                                                                          | Tulokset                                                                                               |
-| Scope and count         | Mapped pharmacies in Finland · {count}                                                           | Kartoitetut apteekit Suomessa · {count}                                                                |
+| Dataset count (web)     | {count} mapped pharmacies in Finland                                                             | {count} kartoitettua apteekkia Suomessa                                                                |
+| Scope and count (iOS)   | Mapped pharmacies in Finland · {count}                                                           | Kartoitetut apteekit Suomessa · {count}                                                                |
 | Distance                | {distance} straight line                                                                         | {distance} linnuntietä                                                                                 |
 | Address unavailable     | Address unavailable                                                                              | Osoite ei saatavilla                                                                                   |
 | Unnamed pharmacy        | Unnamed pharmacy                                                                                 | Nimetön apteekki                                                                                       |

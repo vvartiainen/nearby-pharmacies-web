@@ -134,3 +134,29 @@ export function interiorPoint(rings: readonly Ring[], precision = 1e-7): LatLon 
   const [lon, lat] = outer[0] ?? [0, 0];
   return { lat, lon };
 }
+
+/** Simplify the boundary for the UI, within roughly 110 m in latitude. */
+export function simplifyBoundary(positions: readonly Position[]): Position[] {
+  const first = positions[0];
+  const last = positions.at(-1);
+  if (!first || !last) return [];
+  const [dx, dy] = [last[0] - first[0], last[1] - first[1]];
+  const lengthSquared = dx * dx + dy * dy;
+  let furthest = 0;
+  let maxSquaredDistance = 0.001 ** 2;
+
+  for (let i = 1; i < positions.length - 1; i++) {
+    const [x, y] = positions[i]!;
+    const [px, py] = [x - first[0], y - first[1]];
+    const fraction =
+      lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, (px * dx + py * dy) / lengthSquared));
+    const squaredDistance = (px - fraction * dx) ** 2 + (py - fraction * dy) ** 2;
+    if (squaredDistance > maxSquaredDistance) {
+      furthest = i;
+      maxSquaredDistance = squaredDistance;
+    }
+  }
+  if (furthest === 0) return [first, last];
+  const before = simplifyBoundary(positions.slice(0, furthest + 1));
+  return [...before.slice(0, -1), ...simplifyBoundary(positions.slice(furthest))];
+}

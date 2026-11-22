@@ -18,8 +18,8 @@ Geoapify may only be an optional alternative. Evidence is in
 
 1. **Geocoder: public Nominatim on web and iOS**, called from the client behind a `Geocoder`
    interface. Parameters: `countrycodes=fi`, `addressdetails=1`, `limit=5`, `accept-language` from
-   the UI locale. Labels come from road, house number, municipality (`city`, `town`, `village` or
-   `municipality`) and country.
+   the UI locale. Web labels retain named features and neighborhoods alongside street, house
+   number, municipality and country when available.
 2. **Rate-limit compliance.** One request per submitted search, no autocomplete, no automatic
    retries, at most one request in flight, and a session cache keyed by normalized query and
    language. The browser sends the page Referer; do not set a restrictive `Referrer-Policy`. iOS
@@ -45,6 +45,11 @@ Geoapify may only be an optional alternative. Evidence is in
    `VITE_GEOAPIFY_KEY`; tiles use the same key through the tile settings. Restrict the key to the
    deployed origins in Geoapify MyProjects, use a separate key per environment, never commit it,
    and add "Powered by Geoapify". The public demo build does not set it.
+
+The web app resolves device-origin labels from an address index generated from the same OSM
+extract as the pharmacy data. Only coarse regional shard names are requested from the app host.
+The browser finds the nearest address locally, and device coordinates stay out of the public
+geocoder requests.
 
 ## Consequences
 

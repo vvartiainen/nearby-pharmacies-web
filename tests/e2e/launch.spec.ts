@@ -8,20 +8,23 @@ test.describe("English fallback for an unsupported browser language", () => {
     tiles,
   }, testInfo) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Nearby pharmacies");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pharmacy finder");
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
-    await expect(page).toHaveTitle("Nearby pharmacies");
+    await expect(page).toHaveTitle("Pharmacy finder");
 
     const origin = page.getByTestId("origin");
-    await expect(origin).toContainText("Starting point");
-    await expect(origin).toContainText("Helsinki Central Railway Station (default)");
+    await expect(origin).toHaveValue("Helsinki Central Railway Station (default)");
+    await expect(page.getByText("784 mapped pharmacies in Finland", { exact: true })).toBeVisible();
+    const locationButton = page
+      .locator(".origin-search__field")
+      .getByRole("button", { name: "Use my location" });
+    await expect(locationButton).toBeVisible();
+    await expect(locationButton).toHaveText("");
     if (testInfo.project.name === "desktop-chromium") {
       await expect(page.getByRole("heading", { name: "Nearest pharmacies" })).toBeVisible();
-      await expect(page.getByText(/^Mapped pharmacies in Finland · 784$/)).toBeVisible();
     } else {
       await page.getByRole("button", { name: "Results", exact: true }).click();
       await expect(page.getByRole("heading", { name: "Nearest pharmacies" })).toHaveCount(0);
-      await expect(page.getByText(/^Mapped pharmacies in Finland · 784$/)).toHaveCount(0);
     }
 
     const first = page.locator(".result-row").first();
@@ -48,16 +51,17 @@ test.describe("Finnish for a Finnish browser", () => {
     page,
   }, testInfo) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Lähiapteekit");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Apteekkihaku");
     await expect(page.locator("html")).toHaveAttribute("lang", "fi");
-    await expect(page).toHaveTitle("Lähiapteekit");
+    await expect(page).toHaveTitle("Apteekkihaku");
 
     const origin = page.getByTestId("origin");
-    await expect(origin).toContainText("Lähtöpiste");
-    await expect(origin).toContainText("Helsingin päärautatieasema (oletus)");
+    await expect(origin).toHaveValue("Helsingin päärautatieasema (oletus)");
+    await expect(
+      page.getByText("784 kartoitettua apteekkia Suomessa", { exact: true }),
+    ).toBeVisible();
     if (testInfo.project.name === "desktop-chromium") {
       await expect(page.getByRole("heading", { name: "Lähimmät apteekit" })).toBeVisible();
-      await expect(page.getByText(/^Kartoitetut apteekit Suomessa · 784$/)).toBeVisible();
     } else {
       await page.getByRole("button", { name: "Tulokset", exact: true }).click();
     }

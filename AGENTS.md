@@ -4,8 +4,9 @@ React, TypeScript and Vite web app that lists the pharmacies nearest to a starti
 Finland. The page shows the labelled default origin (Helsinki Central Railway Station), the 20
 nearest pharmacies from the bundled snapshot ranked by straight-line distance, a Leaflet map with
 OSM tiles, a pin per listed pharmacy and the origin marker, and details with opening hours for the
-selected pharmacy. The layouts, tokens and texts follow `docs/design/design-spec.md`. There is no
-search, device location or pin drop yet. The repo also holds the OSM data importer, the bundled
+selected pharmacy. The starting point can come from a city or address search, device location, or
+a point chosen on the map. The layouts and text follow `docs/design/design-spec.md`. The repo also
+holds the OSM data importer, the bundled
 pharmacy snapshot in `src/data/`, the ranking code in `src/ranking/` and the shared ranking fixture
 in `fixtures/ranking/`, which is also used by the iOS app. Product decisions live outside this repo
 in the planning `PLAN.md`.
@@ -21,6 +22,7 @@ Node 26+. `package.json` pins pnpm 12.21.0. Install dependencies from `pnpm-lock
 | `src/app/state.ts`        | Origin, selection and sheet state (`appReducer`), `nearestPharmacies`, `pinPosition`        |
 | `src/app/format.ts`       | Display name with the "Unnamed pharmacy" fallback, address lines                            |
 | `src/components/`         | `ResultRow`, `PharmacyDetails`, `DetailsCard` (desktop), `HoursBlock`                       |
+| `src/origin/`             | Geocoder, bundled place fallback, origin requests and coverage notices                      |
 | `src/hours/`              | `interpretOpeningHours`: weekly view of common OSM `opening_hours` forms, else the raw text |
 | `src/map/PharmacyMap.tsx` | Leaflet map, pins and origin marker                                                         |
 | `src/map/config.ts`       | Build-time tile settings                                                                    |
@@ -50,8 +52,8 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  9 passed (9)` and `Tests  149 passed (149)`                                                           |
-| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `22 passed` and `6 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  11 passed (11)` and `Tests  153 passed (153)`                                                         |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `46 passed` and `6 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |
@@ -68,8 +70,32 @@ every `tile.openstreetmap.org` request with a 1 × 1 PNG, records the URLs in `t
 aborts any other request that does not go to the preview server. `tests/e2e/launch.spec.ts`
 covers both locales; `tests/e2e/selection.spec.ts` covers ranking, row and pin selection, details
 with hours, keyboard use, the desktop details card, the narrow sheet heights, panning and 320 px
-width. Pins near the station overlap at the initial zoom, so pointer tests pick a pin with
-`uncoveredPinName`.
+width. `tests/e2e/origin.spec.ts` covers consent, location results and failures, address
+matches, city fallback, late replies, keyboard map picking and coverage notices. It stubs
+the online geocoder and device location and exercise the bundled address files. Pins near the station overlap at the initial zoom, so
+pointer tests pick a pin with `uncoveredPinName`.
+
+## Origin search and location
+
+The public demo defaults to Nominatim. Search sends only explicitly submitted text and the locale
+and country filter. The browser keeps a session cache and starts at most one outbound geocoding
+request per second per app page, with no autocomplete or retries. Keep use within the public
+service’s application-wide limit and attribution requirements. [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
+
+The deployed `geocoder.json` file configures a Nominatim or Photon endpoint and country filter.
+It's loaded once per page and can be changed on the static host. Keep the filter aligned with the
+bundled data. A build with both `VITE_GEOCODER_PROVIDER=geoapify` and `VITE_GEOAPIFY_KEY` uses
+Geoapify. Vite embeds this key in the browser bundle, so use a site-restricted key.
+
+Submitted matches appear in a dropdown below the field, with the place or street first and the
+neighborhood, municipality, and country where available. Arrow keys highlight a match, Enter
+chooses it, and Escape closes the dropdown.
+
+Device location starts on user action and needs HTTPS or localhost. The app ranks from the GPS
+fix immediately and looks for a nearby address using the bundled OSM index. It requests only the
+relevant regional files from the app host. An unavailable address leaves “Your location” in the
+field. The map picker appears after panning or zooming. Right-click or long-press to position its target directly. Keyboard users can
+focus the map and pan with the arrow keys before choosing “Search from here”.
 
 ## Map tiles
 
@@ -99,10 +125,10 @@ Manual review loads real OSM tiles; keep it light (a few page loads, no scripted
 
 1. Start `pnpm run dev` as a background process and wait for `Local: http://127.0.0.1:5173/`.
 2. Open `http://127.0.0.1:5173/` in the T3 shared browser and take a snapshot. At 900 px and
-   wider, expect a 400 px left panel with the heading "Nearby pharmacies", the caption
-   "Starting point" above "Helsinki Central Railway Station (default)", "Nearest pharmacies",
-   "Mapped pharmacies in Finland · 784" and 20 rows starting with "Steissin Apteekki,
-   50 m". The map fills the rest, with 20 pins, the blue origin dot and
+   wider, expect a 400 px left panel with "Pharmacy finder" above "784 mapped pharmacies in
+   Finland". The search field initially shows "Helsinki Central Railway Station (default)" and
+   has a location icon at its right edge. The "Nearest pharmacies" list starts with "Steissin
+   Apteekki, 50 m". The map fills the rest, with 20 pins, the blue origin dot and
    "© OpenStreetMap contributors" at the bottom right.
 3. Click a row or a pin. The selected pin grows, the other pharmacy pins turn gray, and the map
    fits the starting point and the selected pin with a dashed blue line outlined in white. The row
@@ -113,7 +139,10 @@ Manual review loads real OSM tiles; keep it light (a few page loads, no scripted
 4. The shared browser uses its own language list, so check it with `navigator.languages` in the
    page before judging the locale. Both locales are covered deterministically by
    `pnpm run test:ui`.
-5. Resize below 900 px (for example 390 and 320 px): the results become a sheet over the map that
+5. Submit “Kauppakatu 1” once and choose a municipality from the dropdown. Check that the
+   field shows the selected match and the results change. Pan or right-click the map and choose “Search from here”. Try “Use my location” with
+   location blocked to check the fallback notice.
+6. Resize below 900 px (for example 390 and 320 px): the results become a sheet over the map that
    starts collapsed. The "Results" button expands it to 55 % of the map.
    Selecting expands the drawer and shows details. "Back to results" stays visible while scrolling
    and returns to the expanded list. Collapse the drawer to show only its toggle.
@@ -189,8 +218,8 @@ clarity, as in `test(locale): cover English fallback`.
 
 ## Limitations
 
-- The origin is always the default. City and address search, device location, pin drop and their
-  notices come next in task 6.
+- The bundled index is for place names. Street addresses rely on the online geocoder. Coverage
+  uses the simplified OSM national boundary and warns within about 5 km of the land border.
 - The hours view describes an ordinary week: public holiday (`PH`) rules are ignored, and values
   with months, weeks, dates, comments or `||` (10 of 623 in the snapshot) are shown as raw text.
 - Pins near the station overlap at the initial zoom; clicks hit only the visible pin shape, and
