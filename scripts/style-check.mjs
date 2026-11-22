@@ -58,6 +58,7 @@ function changedFiles() {
   ]);
   return [...paths]
     .filter((path) => {
+      if (path.startsWith(".agents/skills/vercel-react-best-practices/")) return false;
       if (generatedFiles.has(path.split("/").at(-1))) return false;
       if (!formatExtensions.has(extname(path).toLowerCase())) return false;
       const absolute = join(root, path);

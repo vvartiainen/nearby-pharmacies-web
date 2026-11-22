@@ -87,6 +87,12 @@ looping.
   repository. It also skips a new or changed hook until you trust its exact definition, so run
   `/hooks` and trust this one after cloning and after each edit to `.codex/hooks.json`.
 
+## Commits
+
+Keep each commit focused on one change and write a short, imperative Conventional Commit subject
+such as `docs: add agent skills`. Use `type(scope): summary` when naming the affected area adds
+clarity, as in `test(locale): cover English fallback`.
+
 ## Limitations
 
 - The page shows one illustrative distance only. Pharmacy data, ranking, maps and search start in
