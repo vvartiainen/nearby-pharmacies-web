@@ -96,6 +96,13 @@ describe("appReducer", () => {
     const moved: AppState = appReducer(selected, { type: "setOrigin", origin });
     expect(moved).toMatchObject({ origin, selectedId: null, selectionSource: null, view: "list" });
   });
+
+  it("expands the sheet for a point chosen on the map, and only then", () => {
+    const pin = { kind: "pin", lat: 61.5, lon: 23.76 } as const;
+    expect(appReducer(initialState, { type: "setOrigin", origin: pin }).sheet).toBe("expanded");
+    const device = { kind: "device", lat: 61.5, lon: 23.76 } as const;
+    expect(appReducer(initialState, { type: "setOrigin", origin: device }).sheet).toBe("peek");
+  });
 });
 
 describe("pharmacy display helpers", () => {

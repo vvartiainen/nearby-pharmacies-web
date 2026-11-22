@@ -33,7 +33,10 @@ export interface AppState {
    * place of the list in the narrow sheet.
    */
   readonly view: "list" | "details";
-  /** Narrow layouts only: the results sheet in its peek or expanded state. Selection and returning to the list expand it. */
+  /**
+   * Narrow layouts only: the results sheet in its peek or expanded state. Selection, returning to
+   * the list and a point chosen on the map expand it.
+   */
   readonly sheet: "peek" | "expanded";
   /** True after leaving the details, so the list moves focus back to the selected row. */
   readonly restoreRowFocus: boolean;
@@ -79,10 +82,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         restoreRowFocus: false,
       };
     case "setOrigin":
-      // A new origin reranks, so the old selection no longer belongs to the results.
+      // A new origin reranks, so the old selection no longer belongs to the results. A point chosen
+      // on the map opens the sheet to show its results, like iOS.
       return {
         ...state,
         origin: action.origin,
+        sheet: action.origin.kind === "pin" ? "expanded" : state.sheet,
         selectedId: null,
         selectionSource: null,
         view: "list",

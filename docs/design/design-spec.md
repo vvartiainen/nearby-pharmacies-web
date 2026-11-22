@@ -129,6 +129,9 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
   starting point or a selection ends picking. The button is centred over the map: at the top on
   iPhone and narrow web, at the bottom on desktop web, clear of the details card. It turns into
   "Search from here" in place, with a round ✕ "Cancel" button beside it.
+- A point chosen while the iPhone sheet is closed or the narrow web drawer is collapsed opens it
+  to show the new results: the medium detent on iPhone, expanded on web. If the sheet would
+  cover the point, the map moves it to the centre of the visible map at the same zoom.
 - Touch and hold on iOS chooses that point at once. On web, a right click or long press puts the
   target at that point and waits for "Search from here".
 
@@ -225,7 +228,7 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 | Match chosen                                               | The match, with its label                                       | Reranked                      | Cleared       | Fits origin and nearest results                                                                      | None                                                                |
 | No matches                                                 | Unchanged                                                       | Unchanged                     | Unchanged     | Unchanged                                                                                            | "No places in Finland match…" under the field                       |
 | Geocoder failed or rate-limited                            | Unchanged; a city query may still match the bundled place index | Unchanged                     | Unchanged     | Unchanged                                                                                            | "Address search is unavailable…"                                    |
-| Pin dropped (touch and hold on iOS, or "Search from here") | Dropped pin, then Near {address}                                | Reranked                      | Cleared       | Keeps the viewport                                                                                   | None                                                                |
+| Pin dropped (touch and hold on iOS, or "Search from here") | Dropped pin, then Near {address}                                | Reranked                      | Cleared       | Keeps the zoom; moves the point into view if the opened sheet covers it                              | None                                                                |
 | Late geocoder response after a pin drop                    | Stays on the dropped pin                                        | Unchanged                     | Unchanged     | Unchanged                                                                                            | Response ignored                                                    |
 | Map panned or zoomed                                       | Unchanged                                                       | Unchanged                     | Unchanged     | Moves                                                                                                | None                                                                |
 | "Choose on map" pressed                                    | Unchanged                                                       | Unchanged                     | Unchanged     | A target marks the visible map centre; panning moves the map under it                                | "Search from here" and "Cancel" replace "Choose on map"             |

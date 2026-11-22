@@ -393,6 +393,32 @@ test("a pending address lookup cannot relabel a newer starting point", async ({ 
   await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
 });
 
+test("narrow layout: a point chosen on the map opens the drawer and stays in view", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === "desktop-chromium", "narrow layout only");
+  await page.route("**/address-index/**", (route) => route.fulfill({ status: 503 }));
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Results", exact: true });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  // A point just above the collapsed drawer, where the expanded drawer would cover it.
+  const map = page.getByTestId("map");
+  const mapBox = (await map.boundingBox())!;
+  const drawerTop = (await page.locator(".results").boundingBox())!.y;
+  await map.click({
+    button: "right",
+    position: { x: Math.round(mapBox.width * 0.4), y: Math.round(drawerTop - mapBox.y - 30) },
+  });
+  await page.getByRole("button", { name: "Search from here" }).click();
+  await expect(page.getByTestId("origin")).toHaveValue("Dropped pin");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator(".result-row")).toHaveCount(20);
+  const marker = (await page.locator(".origin-marker").boundingBox())!;
+  const expandedTop = (await page.locator(".results").boundingBox())!.y;
+  expect(marker.y + marker.height).toBeLessThan(expandedTop);
+  expect(marker.y).toBeGreaterThan(mapBox.y);
+});
+
 test("a point chosen on the map shows a nearby street address", async ({ page }) => {
   await page.goto("/");
   // Selecting the nearest pharmacy zooms the map in on Elielinaukio, so the centre is next to

@@ -129,6 +129,29 @@ export function PharmacyMap(props: PharmacyMapProps) {
   const cancelPick = useEffectEvent((event: KeyboardEvent) => {
     if (candidate && event.key === "Escape") setMapPick(null);
   });
+  // A chosen point keeps the zoom, but when the sheet opened over it, the map pans it to the
+  // centre of the visible part.
+  const revealOrigin = useEffectEvent((map: LeafletMap) => {
+    const size = map.getSize();
+    const { left, bottom } = props.obscured();
+    const point = map.latLngToContainerPoint(toLatLng(origin));
+    const margin = 40;
+    if (
+      point.x >= left + margin &&
+      point.x <= size.x - margin &&
+      point.y >= margin &&
+      point.y <= size.y - bottom - margin
+    )
+      return;
+    automaticMove.current = true;
+    try {
+      map.panBy([point.x - (size.x + left) / 2, point.y - (size.y - bottom) / 2], {
+        animate: false,
+      });
+    } finally {
+      automaticMove.current = false;
+    }
+  });
   const fitView = useEffectEvent((map: LeafletMap, bounds: LatLngBounds) => {
     automaticMove.current = true;
     try {
@@ -232,6 +255,8 @@ export function PharmacyMap(props: PharmacyMapProps) {
     if (!keepViewport()) {
       const bounds = latLngBounds([toLatLng(origin), ...pins.map((pin) => toLatLng(pin.position))]);
       fitView(map, bounds);
+    } else {
+      revealOrigin(map);
     }
 
     return () => {
