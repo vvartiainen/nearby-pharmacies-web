@@ -1,7 +1,7 @@
 # Pharmacy research samples
 
 Small normalized extracts of OpenStreetMap `amenity=pharmacy` features for design work and test
-fixtures. They are research samples, not the release snapshot: task 5 builds that from a regional
+fixtures. They are research samples, not the release snapshot: the importer builds that from a regional
 extract.
 
 © OpenStreetMap contributors, data available under the Open Database License (ODbL).
@@ -23,8 +23,8 @@ feature has no name), `lat`, `lon`, optional `address` (`street`, `housenumber`,
 `city`), optional `openingHours` (the raw OSM `opening_hours` string), `country` (`FI` for
 features returned by the Finland area query), `source` and an optional `note`. Ways and relations
 use the Overpass bounding-box centre. Area files add `straightLineKm` from the origin: haversine
-with mean Earth radius 6371.0088 km, rounded to 4 decimals in these files only. Task 5 agrees on
-the final constant and the display rounding.
+with mean Earth radius 6371.0088 km, rounded to 4 decimals in these files only. The ranking fixture
+fixes the final constant and the display rounding.
 
 ## Retrieval
 

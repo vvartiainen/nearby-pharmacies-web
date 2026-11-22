@@ -1,7 +1,7 @@
 # ADR 0001: Finland coverage and straight-line ranking
 
-Status: Accepted (2026-11-22). The 50 m duplicate and 5 km border-note thresholds may be tuned in
-task 5.
+Status: Accepted (2026-11-22). The 50 m duplicate and 5 km border-note thresholds were kept by the
+importer.
 
 ## Context
 
@@ -36,8 +36,8 @@ about 34 KB gzipped ([research](../research/finland-pharmacy-data.md)).
   Freshness depends on refreshing the snapshot.
 - Near borders and in the far north the nearest listed pharmacy may not be the nearest real one.
   The disclosure note is the only mitigation in this release.
-- Straight-line order can mislead across rivers. Walking-time ranking remains the documented
-  follow-up in PLAN.md.
+- Straight-line order can mislead across rivers. Walking-time ranking remains a documented
+  follow-up (see the README).
 - One in five rows will show "Hours unavailable", and unnamed features need a fallback or must be
   dropped.
 

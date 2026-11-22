@@ -1,6 +1,6 @@
 # Finland pharmacy data in OpenStreetMap
 
-Research for task 3: how complete and how clean `amenity=pharmacy` data is in Finland, and what
+Research before choosing the data source: how complete and how clean `amenity=pharmacy` data is in Finland, and what
 the nearest results look like from three public landmarks. Data was retrieved from the public
 Overpass API on 2026-11-22 (OSM data timestamp 2026-11-22T13:04:20Z). Queries are in
 [`queries/`](queries/), normalized samples in [`samples/`](samples/).
@@ -114,7 +114,7 @@ The three relations (`relation/18743577` Zeppelinin apteekki, `relation/20011186
 apteekki, `relation/20401883` Lentoaseman apteekki) are rooms inside shopping centres or the
 airport. Their outlines were not retrieved: the query used `out geom tags`, which leaves out
 relation members, and a corrected re-fetch hit public Overpass capacity limits, so it was
-abandoned. Their bboxes are small, but the centroid check for them is left to the task 5
+abandoned. Their bboxes are small, but the centroid check for them is left to the
 importer.
 
 The bbox centre is good enough for distance. A map pin is better placed with a point-on-surface
@@ -122,7 +122,7 @@ or an interior point, which the importer can compute from full geometry.
 
 ## Sample areas
 
-Distances are haversine with mean Earth radius 6371.0088 km. Task 5 fixes the final constant and
+Distances are haversine with mean Earth radius 6371.0088 km. The ranking fixture fixes the final constant and
 rounding.
 
 ### Helsinki Central Railway Station (default origin)
@@ -198,7 +198,7 @@ servers were at capacity, so it was left for the importer's local extract.
 ## Surprises and limitations
 
 - The public Overpass API returned 502 and 504 errors for about half of the attempts on this
-  day. Task 5 should build from a downloaded Geofabrik extract (`finland-latest.osm.pbf`, 742 MB on
+  day. The importer should build from a downloaded Geofabrik extract (`finland-latest.osm.pbf`, 742 MB on
   2026-11-22) with a local tool such as osmium, not from Overpass.
 - The `ISO3166-1=FI` area includes Åland. This is fine for coverage, but its hours and names are
   Swedish.

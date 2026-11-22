@@ -1,6 +1,6 @@
 # Geocoding and web tiles: research
 
-Task 3, second bullet of the planning `HIGH-LEVEL-TASKS.md`. Trials ran on 2026-11-22. The
+Research before choosing the geocoder and the web map tiles. Trials ran on 2026-11-22. The
 decision is in [ADR 0002](../adr/0002-geocoder-and-web-tiles.md).
 
 The defaults must be free, OpenStreetMap-based and keyless, and they must extend to other regions

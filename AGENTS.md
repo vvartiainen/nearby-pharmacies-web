@@ -8,25 +8,28 @@ selected pharmacy. The starting point can come from a city or address search, de
 a point chosen on the map. The layouts and text follow `docs/design/design-spec.md`. The repo also
 holds the OSM data importer, the bundled
 pharmacy snapshot in `src/data/`, the ranking code in `src/ranking/` and the shared ranking fixture
-in `fixtures/ranking/`, which is also used by the iOS app. Product decisions live outside this repo
-in the planning `PLAN.md`.
+in `fixtures/ranking/`, which is also used by the iOS app. `README.md` summarises the product
+decisions for reviewers; the ADRs in `docs/adr/` record the data and provider choices.
 
 Run every command from the repository root. Use Node 22.12 or later in the 22 series, Node 24, or
 Node 26+. `package.json` pins pnpm 12.21.0. Install dependencies from `pnpm-lock.yaml`.
 
 ## Source layout
 
-| Path                      | Contents                                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------- |
-| `src/App.tsx`             | Page layout: origin bar, results panel or sheet, map                                        |
-| `src/app/state.ts`        | Origin, selection and sheet state (`appReducer`), `nearestPharmacies`, `pinPosition`        |
-| `src/app/format.ts`       | Display name with the "Unnamed pharmacy" fallback, address lines                            |
-| `src/components/`         | `ResultRow`, `PharmacyDetails`, `DetailsCard` (desktop), `HoursBlock`                       |
-| `src/origin/`             | Geocoder, bundled place fallback, origin requests and coverage notices                      |
-| `src/hours/`              | `interpretOpeningHours`: weekly view of common OSM `opening_hours` forms, else the raw text |
-| `src/map/PharmacyMap.tsx` | Leaflet map, pins and origin marker                                                         |
-| `src/map/config.ts`       | Build-time tile settings                                                                    |
-| `src/styles.css`          | Design tokens as CSS custom properties (light and dark) and both layouts                    |
+| Path                        | Contents                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `src/App.tsx`               | Page layout: origin bar, results panel or sheet, map                                          |
+| `src/app/state.ts`          | Origin, selection and sheet state (`appReducer`), `nearestPharmacies`, `pinPosition`          |
+| `src/app/format.ts`         | Display name with the "Unnamed pharmacy" fallback, address lines                              |
+| `src/components/`           | `ResultRow`, `PharmacyDetails`, `DetailsCard` (desktop), `HoursBlock`                         |
+| `src/origin/`               | Geocoder, bundled place fallback, nearby address lookup, origin requests and coverage notices |
+| `src/hours/`                | `interpretOpeningHours`: weekly view of common OSM `opening_hours` forms, else the raw text   |
+| `src/map/PharmacyMap.tsx`   | Leaflet map, pins, origin marker and the map point picker                                     |
+| `src/map/config.ts`         | Build-time tile settings                                                                      |
+| `src/ranking/`              | Haversine distance and ranking, checked against the shared fixture                            |
+| `src/i18n/`, `src/locales/` | Locale choice, distance and time formatting, English and Finnish messages                     |
+| `src/data/`                 | Generated pharmacy snapshot, place index, coverage geometry and manifest (never hand-edited)  |
+| `src/styles.css`            | Design tokens as CSS custom properties (light and dark) and both layouts                      |
 
 ## Setup
 
@@ -52,8 +55,8 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  11 passed (11)` and `Tests  154 passed (154)`                                                         |
-| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `48 passed` and `6 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  11 passed (11)` and `Tests  156 passed (156)`                                                         |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `51 passed` and `7 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |

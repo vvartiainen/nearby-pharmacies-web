@@ -46,10 +46,10 @@ Geoapify may only be an optional alternative. Evidence is in
    deployed origins in Geoapify MyProjects, use a separate key per environment, never commit it,
    and add "Powered by Geoapify". The public demo build does not set it.
 
-The web app resolves device-origin labels from an address index generated from the same OSM
-extract as the pharmacy data. Only coarse regional shard names are requested from the app host.
-The browser finds the nearest address locally, and device coordinates stay out of the public
-geocoder requests.
+Both apps label a device fix or a point chosen on the map with the nearest address from an index
+generated from the same OSM extract as the pharmacy data. The web app requests only coarse
+regional shard names from the app host, and the iOS app bundles the shards. The nearest address is
+found on the device, and its coordinates stay out of the public geocoder requests.
 
 ## Consequences
 

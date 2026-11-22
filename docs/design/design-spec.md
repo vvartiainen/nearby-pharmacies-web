@@ -1,11 +1,11 @@
 # Design spec
 
-Status: draft for review, 22 November 2026. The same file lives in `nearby-pharmacies-web` and
+Status: accepted and kept in step with both apps (last updated 23 November 2026). The same file lives in `nearby-pharmacies-web` and
 `nearby-pharmacies-ios`. Change both copies together.
 
-This spec replaces static mock-ups. Both apps follow it directly. The first web screens built in
-task 6 are reviewed against it, and the approved web screenshots become the visual reference for iOS
-and for the final review. Product decisions are in the planning `PLAN.md`,
+This spec replaces static mock-ups. Both apps follow it directly. The web app was built first and
+reviewed against it, and its approved screens became the visual reference for iOS. Product
+decisions are summarised in each repository's README and recorded in
 ADR 0001 (`docs/adr/0001-finland-coverage-and-straight-line-ranking.md`) and
 ADR 0002 (`docs/adr/0002-geocoder-and-web-tiles.md`) in the web repo. Sample content is in the web
 repo's `docs/research/samples/`.
@@ -289,7 +289,7 @@ never translated. Strings with `{…}` take values.
 
 ## Distance format
 
-Proposal, finalized with the ranking fixture in task 5. Format with the active locale's number
+Agreed with the shared ranking fixture (`fixtures/ranking/ranking-v1.json`). Format with the active locale's number
 formatting.
 
 | Unrounded distance  | Shown as       | Example                                      |

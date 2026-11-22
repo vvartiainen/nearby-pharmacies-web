@@ -143,7 +143,7 @@ labels, and 19 display-rounding cases. The expected values come from
 `fixtures/ranking/compute_expected.py`, which uses only the Python standard library and was written
 separately from the TypeScript code. `pnpm run data:check-fixture` re-checks them. The Vitest suite
 `src/ranking/rank.test.ts` checks the TypeScript code against the fixture. The iOS Swift Testing
-suite should check against the same file.
+suites check against the same file.
 
 ## Licence
 
