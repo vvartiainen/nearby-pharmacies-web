@@ -494,14 +494,73 @@ output.origin-controls__caption {
 .map-picker {
   position: absolute;
   top: 2rem;
-  right: var(--spacing-md);
+  left: 50%;
   z-index: 1000;
   display: flex;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+  translate: -50% 0;
 }
 
-.map-picker .origin-action {
+.map-picker__main,
+.map-picker__cancel {
+  min-height: var(--hit-target);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-default);
   box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
+  cursor: pointer;
+}
+
+.map-picker__main {
+  padding: var(--spacing-xs) var(--spacing-lg);
+  border-radius: 999px;
+  color: var(--color-interactive-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.map-picker[data-picking] .map-picker__main {
+  border-color: var(--color-interactive-primary);
+  background: var(--color-interactive-primary);
+  color: var(--color-interactive-on-primary);
+}
+
+.map-picker__cancel {
+  display: grid;
+  place-items: center;
+  width: var(--hit-target);
+  padding: 0;
+  border-radius: 50%;
+  color: var(--color-text-primary);
+  animation: map-picker-cancel-in 0.2s ease-out;
+}
+
+.map-picker__cancel svg {
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+@keyframes map-picker-cancel-in {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-picker__main {
+    transition: none;
+  }
+
+  .map-picker__cancel {
+    animation: none;
+  }
 }
 
 .map-picker__target {
@@ -511,8 +570,8 @@ output.origin-controls__caption {
 
 @media (min-width: 900px) {
   .map-picker {
-    top: var(--spacing-md);
-    right: 4rem;
+    top: auto;
+    bottom: var(--spacing-xl);
   }
 }
 

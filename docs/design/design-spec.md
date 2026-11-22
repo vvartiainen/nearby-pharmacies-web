@@ -124,7 +124,9 @@ Values are CSS pixels on web and points on iOS. Minimum hit target: 44 × 44.
 - A "Choose on map" button over the map starts picking. A target marks the centre of the visible
   map, and panning or zooming moves the map under it. "Search from here" and "Cancel" replace the
   button. "Search from here" makes the target the starting point. "Cancel", Escape on web, a new
-  starting point or a selection ends picking.
+  starting point or a selection ends picking. The button is centred over the map: at the top on
+  iPhone and narrow web, at the bottom on desktop web, clear of the details card. It turns into
+  "Search from here" in place, with a round ✕ "Cancel" button beside it.
 - Touch and hold on iOS chooses that point at once. On web, a right click or long press puts the
   target at that point and waits for "Search from here".
 

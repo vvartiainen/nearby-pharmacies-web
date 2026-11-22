@@ -302,41 +302,39 @@ export function PharmacyMap(props: PharmacyMapProps) {
         data-has-selection={selectedId !== null ? "" : undefined}
         aria-label={label}
       />
-      <div className="map-picker">
-        {candidate ? (
-          <>
-            <button
-              type="button"
-              className="origin-action origin-action--primary"
-              onClick={() => {
-                props.onPlaceOrigin(candidate);
-                focusMap();
-              }}
-            >
-              {props.searchFromHere}
-            </button>
-            <button
-              type="button"
-              className="origin-action"
-              onClick={() => {
-                setMapPick(null);
-                focusMap();
-              }}
-            >
-              {props.cancel}
-            </button>
-          </>
-        ) : (
+      {/* One button at the top centre (bottom centre on desktop, clear of the details card) turns
+          into "Search from here" in place, so focus stays on it; a round Cancel button appears
+          beside it. */}
+      <div className="map-picker" data-picking={candidate ? "" : undefined}>
+        <button
+          type="button"
+          className="map-picker__main"
+          onClick={() => {
+            if (candidate) {
+              props.onPlaceOrigin(candidate);
+            } else {
+              candidateAtCentre(mapRef.current!, true);
+            }
+            // Arrow keys then move the map under the target.
+            focusMap();
+          }}
+        >
+          {candidate ? props.searchFromHere : props.chooseOnMap}
+        </button>
+        {candidate && (
           <button
             type="button"
-            className="origin-action"
+            className="map-picker__cancel"
+            aria-label={props.cancel}
+            title={props.cancel}
             onClick={() => {
-              candidateAtCentre(mapRef.current!, true);
-              // Arrow keys then move the map under the target.
+              setMapPick(null);
               focusMap();
             }}
           >
-            {props.chooseOnMap}
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" />
+            </svg>
           </button>
         )}
       </div>

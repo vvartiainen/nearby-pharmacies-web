@@ -317,8 +317,27 @@ test("panning alone keeps the origin and choosing on the map can be cancelled", 
   await expect(page.getByRole("button", { name: "Search from here" })).toHaveCount(0);
   await expect(page.locator(".map-picker__target")).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Choose on map" }).click();
+  // "Choose on map" is centred over the map and turns into "Search from here" in place, with
+  // Cancel beside it; the pair stays centred.
+  const mapBox = (await page.locator(".map-area").boundingBox())!;
+  const mapCentre = mapBox.x + mapBox.width / 2;
+  const choose = page.getByRole("button", { name: "Choose on map" });
+  const chooseBox = (await choose.boundingBox())!;
+  expect(Math.abs(chooseBox.x + chooseBox.width / 2 - mapCentre)).toBeLessThanOrEqual(1);
+  await choose.click();
   await expect(page.locator(".map-picker__target")).toHaveCount(1);
+  // Measure after Cancel has scaled in.
+  await page
+    .getByRole("button", { name: "Cancel" })
+    .evaluate((element) =>
+      Promise.all(element.getAnimations().map((animation) => animation.finished)),
+    );
+  const searchBox = (await page.getByRole("button", { name: "Search from here" }).boundingBox())!;
+  const cancelBox = (await page.getByRole("button", { name: "Cancel" }).boundingBox())!;
+  expect(searchBox.y).toBeCloseTo(chooseBox.y, 0);
+  expect(
+    Math.abs((searchBox.x + cancelBox.x + cancelBox.width) / 2 - mapCentre),
+  ).toBeLessThanOrEqual(1);
   await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page.locator(".map-picker__target")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Choose on map" })).toBeVisible();
