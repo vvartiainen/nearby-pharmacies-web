@@ -17,7 +17,7 @@ export default defineConfig({
     { name: "narrow-webkit", use: { ...devices["iPhone 13"] } },
   ],
   webServer: {
-    command: `npm run build && npx vite preview --port ${port}`,
+    command: `pnpm run build && pnpm exec vite preview --port ${port}`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120_000,

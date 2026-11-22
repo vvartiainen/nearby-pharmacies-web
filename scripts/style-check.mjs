@@ -5,7 +5,8 @@
 //   node scripts/style-check.mjs --hook   agent Stop hook mode for Claude Code and Codex
 //
 // Files checked: tracked files with staged or unstaged changes plus untracked files that Git does
-// not ignore. Deleted files, symlinks and unsupported extensions are skipped. Nothing is rewritten.
+// not ignore. Deleted files, symlinks, pnpm-lock.yaml and unsupported extensions are skipped.
+// Nothing is rewritten.
 
 import { spawnSync } from "node:child_process";
 import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
@@ -23,7 +24,7 @@ const formatExtensions = new Set([
   ".yaml",
   ".yml",
 ]);
-const generatedFiles = new Set(["package-lock.json"]);
+const generatedFiles = new Set(["pnpm-lock.yaml"]);
 const maxReasonLength = 12_000;
 
 const root = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), ".."));
@@ -69,7 +70,8 @@ function changedFiles() {
 
 function tool(name) {
   const binary = join(root, "node_modules", ".bin", name);
-  if (!existsSync(binary)) throw new Error(`${name} is not installed. Run: npm ci`);
+  if (!existsSync(binary))
+    throw new Error(`${name} is not installed. Run: pnpm install --frozen-lockfile`);
   return binary;
 }
 
@@ -98,7 +100,7 @@ function check() {
       .map((line) => line.trim().replace(/^\.\//, ""))
       .filter((line) => files.includes(line));
     const fix =
-      listed.length > 0 ? `\nFix with: npm run format -- ${listed.map(shellQuote).join(" ")}` : "";
+      listed.length > 0 ? `\nFix with: pnpm run format ${listed.map(shellQuote).join(" ")}` : "";
     problems.push(`Oxfmt found files that are not formatted:\n${format.output}${fix}`);
   }
 
@@ -140,7 +142,7 @@ if (result.ok) process.exit(0);
 const reason = result.summary.slice(0, maxReasonLength);
 const output = input.stop_hook_active
   ? {
-      systemMessage: `Style check still failing after one retry; not blocking again. Run: npm run style\n${reason}`,
+      systemMessage: `Style check still failing after one retry; not blocking again. Run: pnpm run style\n${reason}`,
     }
   : {
       decision: "block",
