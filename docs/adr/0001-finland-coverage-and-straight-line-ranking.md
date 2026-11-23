@@ -25,7 +25,7 @@ about 34 KB gzipped ([research](../research/finland-pharmacy-data.md)).
 3. **Areas.** Map ways and relations to one point at import. For distance, the bounding-box centre
    is acceptable. The importer should store an interior point (point-on-surface) so that pins
    land inside the outline.
-4. **Duplicates.** Proposed importer rule: drop a feature that has no `name` and lies within 50 m
+4. **Duplicates.** Importer rule: drop a feature that has no `name` and lies within 50 m
    of a named pharmacy, or inside its outline. Otherwise keep both, even when close: neighbouring
    pharmacies are real. Log each drop with both IDs and report same-name pairs within 1 km for
    manual review instead of merging them.

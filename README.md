@@ -93,7 +93,9 @@ a browser test fails.
 
 ## Limitations
 
-- Distances are straight lines. Street-address search requires a network connection.
+- Distances are straight lines, so water or rail can make a listed pharmacy farther away on foot.
+  Ranking by walking time is the natural follow-up. Street-address search requires a network
+  connection.
 - Address and opening-hours availability depend on the snapshot. The weekly schedule excludes
   public holidays.
 - On phones, expanding the drawer can cover pins near the bottom of the initial map view.
