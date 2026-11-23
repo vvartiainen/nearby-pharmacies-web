@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, type ReactNode, type RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 import type { Messages } from "../../shared/i18n/messages";
 
 export interface DetailsCardProps {
@@ -15,25 +15,18 @@ export interface DetailsCardProps {
  * focus trap or backdrop. The close button, or Escape while focus is inside, closes it.
  */
 export function DetailsCard({ ref, messages, onClose, selectionKey, children }: DetailsCardProps) {
-  const close = useEffectEvent(() => onClose());
-  useEffect(() => {
-    const card = ref.current;
-    if (!card) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      close();
-    };
-    card.addEventListener("keydown", onKeyDown);
-    return () => card.removeEventListener("keydown", onKeyDown);
-  }, [ref]);
-
   return (
+    // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Escape bubbles up from the focused controls inside.
     <section
       ref={ref}
       className="details-card"
       data-testid="details-card"
       aria-label={messages.detailsLabel}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        onClose();
+      }}
     >
       <button
         type="button"

@@ -125,9 +125,6 @@ export function PharmacyMap(props: PharmacyMapProps) {
       map.containerPointToLatLng([(size.x + left) / 2, (size.y - bottom) / 2]).wrap(),
     );
   });
-  const cancelPick = useEffectEvent((event: KeyboardEvent) => {
-    if (candidate && event.key === "Escape") setMapPick(null);
-  });
   const revealPoint = useEffectEvent((map: LeafletMap, position: LatLon) => {
     const size = map.getSize();
     const { left, bottom } = props.obscured();
@@ -184,7 +181,6 @@ export function PharmacyMap(props: PharmacyMapProps) {
     tileLayer(tileSettings.url, { maxZoom: tileSettings.maxZoom }).addTo(map);
     mapRef.current = map;
     map.on("moveend", () => candidateAtCentre(map));
-    container.addEventListener("keydown", cancelPick);
     map.on("contextmenu", (event: LeafletMouseEvent) => {
       chooseCandidate(event.latlng.wrap(), true);
     });
@@ -201,7 +197,6 @@ export function PharmacyMap(props: PharmacyMapProps) {
     if (resultsPanelRef.current) resize.observe(resultsPanelRef.current);
     return () => {
       resize.disconnect();
-      container.removeEventListener("keydown", cancelPick);
       map.remove();
       mapRef.current = null;
     };
@@ -326,12 +321,16 @@ export function PharmacyMap(props: PharmacyMapProps) {
 
   return (
     <>
+      {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Leaflet makes the map focusable; Escape ends a pick. */}
       <section
         ref={containerRef}
         className="map"
         data-testid="map"
         data-has-selection={selectedId !== null ? "" : undefined}
         aria-label={label}
+        onKeyDown={(event) => {
+          if (candidate && event.key === "Escape") setMapPick(null);
+        }}
       />
       <div className="map-picker" data-picking={candidate ? "" : undefined}>
         <button
