@@ -108,7 +108,6 @@ export function ResultsPanel({
                   distance={distance}
                   distanceBand={band}
                   selected={isSelected}
-                  reveal={isSelected}
                   focus={isSelected && restoreRowFocus}
                   onSelect={onSelect}
                 />

@@ -7,7 +7,6 @@ export interface ResultRowProps {
   readonly distance: string;
   readonly distanceBand: DistanceBand;
   readonly selected: boolean;
-  readonly reveal: boolean;
   readonly focus: boolean;
   readonly onSelect: (id: string) => void;
 }
@@ -18,16 +17,15 @@ export function ResultRow({
   distance,
   distanceBand,
   selected,
-  reveal,
   focus,
   onSelect,
 }: ResultRowProps) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (!reveal) return;
+    if (!selected) return;
     ref.current?.scrollIntoView({ block: "nearest" });
     if (focus) ref.current?.focus({ preventScroll: true });
-  }, [reveal, focus]);
+  }, [selected, focus]);
 
   return (
     <li>
