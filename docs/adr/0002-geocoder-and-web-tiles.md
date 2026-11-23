@@ -2,16 +2,15 @@
 
 Status: Accepted (2026-11-22). The project owner accepted the public Nominatim
 [usage policy](https://operations.osmfoundation.org/policies/nominatim/) for the demo after
-comparing Photon, a self-hosted instance, bundled addresses and Digitransit. A
-self-hosted Nominatim or Photon is the upgrade path if traffic grows.
+comparing Photon, a self-hosted instance, the bundled place index and Digitransit.
 
 ## Context
 
 Origin search takes a submitted "City or street address" query, lists matches with municipality
 and country, and biases results to Finland. Ranking runs on the device against the bundled OSM
 pharmacy snapshot, so the geocoder only receives the search text. The defaults must be free,
-OSM-based and keyless, the public demo must run without keys, and other regions must be easy to add.
-Geoapify may only be an optional alternative. Evidence is in
+OSM-based and keyless, and other regions must be easy to add.
+Evidence is in
 [the research note](../research/geocoding-and-tiles.md).
 
 ## Decision
@@ -25,10 +24,11 @@ Geoapify may only be an optional alternative. Evidence is in
    language. The browser sends the page Referer; do not set a restrictive `Referrer-Policy`. iOS
    sends `User-Agent: NearbyPharmacies/<version> (<repo URL>)`. Show "Search © OpenStreetMap
    contributors" next to the results.
-3. **Switchable without an app update.** The provider, endpoint and region filter come from a small
-   static `geocoder.json` served with the web demo. iOS fetches it at launch and falls back to the
-   copy in the app. Supported providers: `nominatim` (default, any instance URL), `photon` (keyless
-   alternative) and `geoapify`.
+3. **Configurable providers.** The web app loads `geocoder.json` from its host on each page load.
+   iOS checks the configuration in its published source repository on the first address search
+   and uses its bundled copy when the remote file is unavailable. Both support Nominatim and
+   Photon. The controlled demo uses public Nominatim with one reviewer at a time. Deploy an
+   unrestricted web demo with `{"provider":"local"}` for bundled city and town search.
 4. **Bundled place index.** The OSM importer also emits municipalities, cities, towns and villages
    (about 4,700 entries for Finland) with `name:sv`, municipality and coordinates. It answers city
    searches when the geocoder fails, times out, is rate-limited or returns nothing, with local fuzzy
@@ -36,23 +36,18 @@ Geoapify may only be an optional alternative. Evidence is in
    depend on either.
 5. **iOS basemap.** MapKit draws the iOS map.
 6. **Web map: Leaflet with OSM Standard raster tiles** from `https://tile.openstreetmap.org/{z}/{x}/{y}.png`,
-   max zoom 19, attribution "© OpenStreetMap contributors" linked to `openstreetmap.org/copyright`,
-   plus a "Report a map issue" link. The tile URL, attribution and max zoom are build-time settings,
+   max zoom 19, attribution "© OpenStreetMap contributors" linked to `openstreetmap.org/copyright`.
+   The tile URL, attribution and max zoom are build-time settings,
    so a switch needs only a redeploy. The keyless fallback is OpenFreeMap, which also needs
    `maplibre-gl` and `@maplibre/maplibre-gl-leaflet`. CARTO is excluded: its tiles need a key since
    2026-09-25.
-7. **Optional Geoapify.** Enabled only when a build sets `VITE_GEOCODER_PROVIDER=geoapify` and
-   `VITE_GEOAPIFY_KEY`; tiles use the same key through the tile settings. Restrict the key to the
-   deployed origins in Geoapify MyProjects, use a separate key per environment, never commit it,
-   and add "Powered by Geoapify". The public demo build does not set it.
-
-Both apps label a device fix “Your location” and a point chosen on the map “Dropped pin.” They
-rank locally from the fix or point coordinates.
+   Both apps label a device fix “Your location” and a point chosen on the map “Dropped pin.” They
+   rank locally from the fix or point coordinates.
 
 ## Consequences
 
-- The demo depends on donated OSMF capacity with no SLA. A busy deployment must move to its own
-  Nominatim or Photon instance or Geoapify, which is a configuration change.
+- The demo depends on donated OSMF capacity with no SLA. A wider deployment that needs online address search can configure
+  a hosted or self-hosted geocoder whose terms fit its traffic.
 - Nominatim has no typo tolerance, so "No matches" with a spelling hint is a normal outcome.
 - Web and iOS return the same matches for the same query and share the geocoder fixtures.
 - Playwright and XCUITest stub geocoder and tile requests. The OSM tile policy bans automated

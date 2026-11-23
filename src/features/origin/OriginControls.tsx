@@ -34,8 +34,8 @@ export function OriginControls({
   const matches = editing && search.kind === "matches" ? search.matches : null;
   const activeIndex = activeMatch?.matches === matches ? activeMatch.index : -1;
   const privacy =
-    provider === "geoapify"
-      ? messages.searchPrivacyGeoapify
+    provider === "local"
+      ? messages.searchPrivacyLocal
       : provider === "photon"
         ? messages.searchPrivacyPhoton
         : messages.searchPrivacy;
@@ -88,7 +88,7 @@ export function OriginControls({
                 aria-controls={matches ? "origin-matches" : undefined}
                 aria-activedescendant={activeIndex >= 0 ? `origin-match-${activeIndex}` : undefined}
                 data-testid="origin"
-                aria-label={messages.searchLabel}
+                aria-label={provider === "local" ? messages.searchLabelLocal : messages.searchLabel}
                 aria-describedby="search-privacy"
                 value={query ?? originLabel}
                 title={query === null ? originLabel : undefined}
@@ -227,17 +227,12 @@ export function OriginControls({
                 <a href="https://www.openstreetmap.org/copyright" onBlur={endEditing}>
                   {messages.searchAttribution}
                 </a>
-                {provider === "geoapify" && !search.local ? (
-                  <a href="https://www.geoapify.com/" onBlur={endEditing}>
-                    Powered by Geoapify
-                  </a>
-                ) : null}
               </div>
             </div>
           ) : null}
         </div>
         <p id="search-privacy" className="origin-controls__caption">
-          {privacy} {messages.searchPrivacyPublicPlaces}
+          {privacy} {provider !== "local" ? messages.searchPrivacyPublicPlaces : null}
         </p>
       </form>
       {controls.offerLocation ? (

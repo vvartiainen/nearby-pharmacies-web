@@ -7,20 +7,15 @@ export interface PlaceMatch extends LatLon {
   readonly label: string;
 }
 
-type Provider = "nominatim" | "photon" | "geoapify";
-interface GeocoderConfig {
-  readonly provider: Provider;
+interface OnlineGeocoderConfig {
+  readonly provider: "nominatim" | "photon";
   readonly endpoint: string;
   readonly countryCode: string;
-  readonly key?: string;
 }
+type GeocoderConfig = OnlineGeocoderConfig | { readonly provider: "local" };
 type Fields = Record<string, unknown>;
 
-const defaultConfig: GeocoderConfig = {
-  provider: "nominatim",
-  endpoint: "https://nominatim.openstreetmap.org/search",
-  countryCode: "fi",
-};
+const localConfig = { provider: "local" } as const;
 
 function record(value: unknown): Fields {
   return value !== null && typeof value === "object" ? (value as Fields) : {};
@@ -38,21 +33,12 @@ function coordinate(value: unknown) {
 
 let configRequest: Promise<GeocoderConfig> | undefined;
 export function loadGeocoderConfig(): Promise<GeocoderConfig> {
-  const key = import.meta.env.VITE_GEOAPIFY_KEY;
-  if (import.meta.env.VITE_GEOCODER_PROVIDER === "geoapify" && key) {
-    return Promise.resolve({
-      provider: "geoapify",
-      endpoint: "https://api.geoapify.com/v1/geocode/search",
-      countryCode: "fi",
-      key,
-    });
-  }
   configRequest ??= fetch(`${import.meta.env.BASE_URL}geocoder.json`, {
     cache: "no-cache",
     signal: AbortSignal.timeout(3000),
   })
     .then(async (response): Promise<GeocoderConfig> => {
-      if (!response.ok) return defaultConfig;
+      if (!response.ok) return localConfig;
       const { provider, endpoint, countryCode } = record(await response.json());
       if (
         (provider === "nominatim" || provider === "photon") &&
@@ -63,34 +49,26 @@ export function loadGeocoderConfig(): Promise<GeocoderConfig> {
       ) {
         return { provider, endpoint, countryCode: countryCode.toLowerCase() };
       }
-      return defaultConfig;
+      return localConfig;
     })
-    .catch(() => defaultConfig);
+    .catch(() => localConfig);
   return configRequest;
 }
 
-function searchUrl(config: GeocoderConfig, query: string, locale: SupportedLocale) {
+function searchUrl(config: OnlineGeocoderConfig, query: string, locale: SupportedLocale) {
   const url = new URL(config.endpoint);
   const { countryCode, provider } = config;
   const parameters =
-    provider === "geoapify"
-      ? {
-          text: query,
-          lang: locale,
+    provider === "photon"
+      ? { q: query, lang: locale, limit: "5", countrycode: countryCode.toUpperCase() }
+      : {
+          q: query,
+          format: "jsonv2",
+          addressdetails: "1",
+          "accept-language": locale,
+          countrycodes: countryCode,
           limit: "5",
-          filter: `countrycode:${countryCode}`,
-          apiKey: config.key ?? "",
-        }
-      : provider === "photon"
-        ? { q: query, lang: locale, limit: "5", countrycode: countryCode.toUpperCase() }
-        : {
-            q: query,
-            format: "jsonv2",
-            addressdetails: "1",
-            "accept-language": locale,
-            countrycodes: countryCode,
-            limit: "5",
-          };
+        };
   for (const [key, value] of Object.entries(parameters)) url.searchParams.set(key, value);
   return url;
 }
@@ -106,7 +84,7 @@ export function placeMatch(
 
 function readMatches(
   payload: unknown,
-  { provider, countryCode }: GeocoderConfig,
+  { provider, countryCode }: OnlineGeocoderConfig,
   locale: SupportedLocale,
 ) {
   const nominatim = provider === "nominatim";
@@ -183,6 +161,7 @@ export function createGeocoder(): Geocoder {
     async search(query, locale, signal) {
       const config = await loadGeocoderConfig();
       signal.throwIfAborted();
+      if (config.provider === "local") return [];
       const cacheKey = `${locale}:${query.normalize("NFC").toLocaleLowerCase(locale)}`;
       const cached = cache.get(cacheKey);
       if (cached) return cached;

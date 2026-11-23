@@ -39,6 +39,7 @@ export interface PharmacyMapProps {
   readonly selectedId: string | null;
   readonly selectionCount: number;
   readonly attribution: string;
+  readonly dataAttribution: string;
   readonly attributionPosition: ControlPosition;
   readonly zoomPosition: ControlPosition;
   /** CSS pixels of the map covered at its edges: the narrow sheet below, the desktop card left. */
@@ -214,17 +215,18 @@ export function PharmacyMap(props: PharmacyMapProps) {
     };
   }, [zoomPosition]);
 
-  const { attribution, attributionPosition } = props;
+  const { attribution, attributionPosition, dataAttribution } = props;
   useEffect(() => {
     const map = mapRef.current!;
     const attributionControl = control
       .attribution({ position: attributionPosition, prefix: false })
       .addAttribution(attributionHtml(attribution, tileSettings.attributionUrl))
+      .addAttribution(attributionHtml(dataAttribution, `${import.meta.env.BASE_URL}data.html`))
       .addTo(map);
     return () => {
       attributionControl.remove();
     };
-  }, [attribution, attributionPosition]);
+  }, [attribution, attributionPosition, dataAttribution]);
 
   useEffect(() => {
     const map = mapRef.current!;

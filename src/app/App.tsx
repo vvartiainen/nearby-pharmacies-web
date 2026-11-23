@@ -80,6 +80,9 @@ export function App({ locale }: { locale: SupportedLocale }) {
           ? messages.pinOrigin
           : messages.defaultOrigin;
   const count = new Intl.NumberFormat(locale).format(pharmacySnapshot.pharmacies.length);
+  const tileAttribution = tileSettings.attributionText ?? messages.mapAttribution;
+  const dataAttribution =
+    tileAttribution === messages.mapAttribution ? messages.dataLicence : messages.mapAttribution;
 
   return (
     <main className="app" data-layout={isDesktop ? "desktop" : "narrow"}>
@@ -115,7 +118,8 @@ export function App({ locale }: { locale: SupportedLocale }) {
           pins={pins}
           selectedId={state.selectedId}
           selectionCount={state.selectionCount}
-          attribution={tileSettings.attributionText ?? messages.mapAttribution}
+          attribution={tileAttribution}
+          dataAttribution={dataAttribution}
           attributionPosition={isDesktop ? "bottomright" : "topright"}
           zoomPosition={isDesktop ? "topright" : "topleft"}
           obscured={obscured}

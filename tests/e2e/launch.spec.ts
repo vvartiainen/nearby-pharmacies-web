@@ -53,6 +53,29 @@ test.describe("English fallback for an unsupported browser language", () => {
   });
 });
 
+test("offers the exact data downloads and software licences", async ({ page }) => {
+  await page.goto("/");
+  const licence = page.getByRole("link", { name: "Data and licence" });
+  await expect(licence).toBeVisible();
+  const [downloads] = await Promise.all([page.context().waitForEvent("page"), licence.click()]);
+  await expect(downloads.getByRole("heading", { level: 1 })).toContainText("Data and licence");
+  for (const name of [
+    "pharmacies.fi.json",
+    "places.fi.json",
+    "coverage.fi.json",
+    "ODbL-NOTICE.txt",
+  ]) {
+    const link = downloads.getByRole("link", { name, exact: true });
+    await expect(link).toHaveAttribute("download", name);
+    expect((await downloads.request.get((await link.getAttribute("href"))!)).ok()).toBe(true);
+  }
+  const software = downloads.getByRole("link", { name: "Third-party software licences" });
+  await expect(software).toBeVisible();
+  const notices = await downloads.request.get((await software.getAttribute("href"))!);
+  expect(notices.ok()).toBe(true);
+  expect(await notices.text()).toContain("## leaflet -");
+});
+
 test.describe("Finnish for a Finnish browser", () => {
   test.use({ locale: "fi-FI" });
 

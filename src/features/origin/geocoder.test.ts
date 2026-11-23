@@ -2,7 +2,6 @@ import { afterEach, expect, it, vi } from "vitest";
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  vi.unstubAllEnvs();
   vi.resetModules();
 });
 
@@ -49,30 +48,15 @@ it("can switch to a configured Photon endpoint without a build", async () => {
   expect(new URL(String(fetch.mock.calls[1]?.[0])).searchParams.get("countrycode")).toBe("FI");
 });
 
-it("uses the configured Geoapify provider and key", async () => {
-  vi.stubEnv("VITE_GEOCODER_PROVIDER", "geoapify");
-  vi.stubEnv("VITE_GEOAPIFY_KEY", "test-key");
-  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(
-    Response.json({
-      features: [
-        {
-          geometry: sampleGeometry,
-          properties: {
-            street: "Kauppakatu",
-            housenumber: "1",
-            city: "Tampere",
-            country: "Finland",
-            country_code: "fi",
-          },
-        },
-      ],
-    }),
-  );
+it.each([
+  ["local mode", () => Response.json({ provider: "local" })],
+  ["invalid configuration", () => Response.json({ provider: "unknown" })],
+  ["missing configuration", () => new Response(null, { status: 404 })],
+])("makes no online geocoding request in %s", async (_mode, response) => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(response());
   vi.stubGlobal("fetch", fetch);
   const { createGeocoder } = await import("./geocoder");
-  const matches = await createGeocoder().search("Kauppakatu 1", "en", new AbortController().signal);
-  expect(matches).toEqual([expected]);
-  const url = new URL(String(fetch.mock.calls[0]?.[0]));
-  expect(url.searchParams.get("filter")).toBe("countrycode:fi");
-  expect(url.searchParams.get("apiKey")).toBe("test-key");
+  const matches = await createGeocoder().search("Tampere", "en", new AbortController().signal);
+  expect(matches).toEqual([]);
+  expect(fetch).toHaveBeenCalledTimes(1);
 });

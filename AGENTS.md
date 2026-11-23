@@ -60,8 +60,8 @@ Use `pnpm run <script>` for the project scripts. Pass arguments directly after t
 | Interactive dev server               | `pnpm run dev`                      | `Local: http://127.0.0.1:5173/`; keeps running until stopped                                                       |
 | Type check and production build      | `pnpm run build`                    | `tsc` prints nothing, then Vite prints `dist/...` sizes and `✓ built in ...`                                       |
 | Serve the build                      | `pnpm run preview`                  | `Local: http://127.0.0.1:4173/`                                                                                    |
-| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  14 passed (14)` and `Tests  158 passed (158)`                                                         |
-| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `46 passed` and `8 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
+| Unit tests (Vitest)                  | `pnpm run test:unit`                | `Test Files  14 passed (14)` and `Tests  160 passed (160)`                                                         |
+| UI tests (Playwright Test)           | `pnpm run test:ui`                  | `48 passed` and `8 skipped` (layout-specific tests) on `desktop-chromium` and `narrow-webkit`                      |
 | Style check of changed and new files | `pnpm run style`                    | `style: OK, N changed file(s): ...` or `style: no changed source files`, exit 0; diagnostics and exit 1 on failure |
 | Style check of the whole repo        | `pnpm run style:all`                | Oxlint prints nothing when clean; Oxfmt prints `All matched files use the correct format.`; exit 0                 |
 | Apply formatting                     | `pnpm run format ./path/to/file.ts` | Rewrites only the named files; omit the paths to format the whole repo                                             |
@@ -85,15 +85,15 @@ pointer tests pick a pin with `uncoveredPinName`.
 
 ## Origin search and location
 
-The public demo defaults to Nominatim. Search sends only explicitly submitted text and the locale
+The controlled reviewer demo uses Nominatim with one reviewer at a time. Search sends only explicitly submitted text and the locale
 and country filter. The browser keeps a session cache and starts at most one outbound geocoding
 request per second per app page, with no autocomplete or retries. Keep use within the public
 service’s application-wide limit and attribution requirements. [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
 
-The deployed `geocoder.json` file configures a Nominatim or Photon endpoint and country filter.
-It's loaded once per page and can be changed on the static host. Keep the filter aligned with the
-bundled data. A build with both `VITE_GEOCODER_PROVIDER=geoapify` and `VITE_GEOAPIFY_KEY` uses
-Geoapify. Vite embeds this key in the browser bundle, so use a site-restricted key.
+The deployed `geocoder.json` configures a Nominatim or Photon endpoint and country filter. It is
+loaded once per page and can be changed on the static host. Keep the filter aligned with the
+bundled data. For an unrestricted public demo, deploy `{"provider":"local"}` in that file so
+search uses the bundled city and town index. Missing or invalid configurations also use the index.
 
 Submitted matches appear in a dropdown below the field, with the place or street first and the
 neighborhood, municipality, and country where available. Arrow keys highlight a match, Enter

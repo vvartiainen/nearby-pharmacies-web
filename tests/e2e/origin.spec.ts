@@ -351,15 +351,14 @@ test("changing the drawer keeps an active map target visible", async ({ page }, 
   const map = page.getByTestId("map");
   const drawer = page.locator(".results");
   const target = page.locator(".map-picker__target");
+  const targetIsAboveDrawer = async () => {
+    const [targetBox, drawerBox] = await Promise.all([target.boundingBox(), drawer.boundingBox()]);
+    return targetBox !== null && drawerBox !== null && targetBox.y + targetBox.height < drawerBox.y;
+  };
   const toggle = resultsToggle(page);
   await page.getByRole("button", { name: "Choose on map" }).click();
   await toggle.click();
-  await expect
-    .poll(async () => {
-      const box = (await target.boundingBox())!;
-      return box.y + box.height < (await drawer.boundingBox())!.y;
-    })
-    .toBe(true);
+  await expect.poll(targetIsAboveDrawer).toBe(true);
   await toggle.click();
   const mapBox = (await map.boundingBox())!;
   await map.click({
@@ -373,12 +372,7 @@ test("changing the drawer keeps an active map target visible", async ({ page }, 
   };
   const before = await offsetFromOrigin();
   await toggle.click();
-  await expect
-    .poll(async () => {
-      const box = (await target.boundingBox())!;
-      return box.y + box.height < (await drawer.boundingBox())!.y;
-    })
-    .toBe(true);
+  await expect.poll(targetIsAboveDrawer).toBe(true);
   const after = await offsetFromOrigin();
   expect(Math.abs(after.x - before.x)).toBeLessThan(2);
   expect(Math.abs(after.y - before.y)).toBeLessThan(2);

@@ -1,8 +1,4 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [
-    "pnpm-lock.yaml",
-    ".agents/skills/vercel-react-best-practices/**",
-    "src/data/*.json"
-  ]
+  "ignorePatterns": ["pnpm-lock.yaml", "src/data/*.json"]
 }

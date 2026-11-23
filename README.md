@@ -41,6 +41,16 @@ English.
 - **Map tiles** come from OpenStreetMap through Leaflet. The tile provider receives requests for
   the visible map area. [Tile configuration](AGENTS.md#map-tiles)
 
+## Reviewer demo
+
+The checked-in configuration enables Nominatim for a controlled review with one reviewer at a
+time. The service caps traffic across the app at one request per second. Keep online search to
+submitted public places and addresses. [Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)
+
+For an unrestricted hosted demo, set the deployed `geocoder.json` next to `index.html` to
+`{"provider":"local"}`. The app then searches the bundled city and town index. The host can
+update the file without rebuilding the app.
+
 ## Repository
 
 | Path                         | Contents                                                              |
@@ -83,4 +93,6 @@ and used the reviewed screens and fixtures for the iOS implementation.
 
 Pharmacy, place, boundary, and address data © OpenStreetMap contributors, under the
 [Open Database License](https://www.openstreetmap.org/copyright). See the
-[bundled data notice](src/data/ODbL-NOTICE.txt).
+[bundled data notice](src/data/ODbL-NOTICE.txt) and [machine-readable snapshot](src/data/).
+The production app links to **Data and licence**, which offers the exact JSON used in that build.
+The build also includes `third-party-licenses.txt` for the software shipped to the browser.

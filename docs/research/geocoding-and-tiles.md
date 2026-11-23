@@ -4,9 +4,8 @@ Research before choosing the geocoder and the web map tiles. Trials ran on 2026-
 decision is in [ADR 0002](../adr/0002-geocoder-and-web-tiles.md).
 
 The defaults must be free, OpenStreetMap-based and keyless, and they must extend to other regions
-later. Geoapify stays an optional provider behind the same interface. The public web demo must work
-without keys. Distance ranking happens on the device from the bundled OSM pharmacy snapshot, so the
-geocoder only receives the submitted search text.
+later. Distance ranking happens on the device from the bundled OSM pharmacy snapshot. The online
+geocoder receives the submitted search text, language, and country filter.
 
 > **Nominatim usage policy.** The public instance at `nominatim.openstreetmap.org` runs on donated
 > servers with very limited capacity. Its [usage policy][nom-policy] allows end-user-triggered
@@ -19,13 +18,12 @@ geocoder only receives the submitted search text.
 
 ## Geocoder candidates
 
-| Candidate                                   | Key            | Terms for this app                                                                                                                                            | Finland bias                                                                    | Language                                                                                       | Swedish names          | Typo tolerance | Other regions                    |
-| ------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------- | -------------- | -------------------------------- |
-| Nominatim, OSMF public instance             | None           | Max 1 req/s total, identifying Referer or User-Agent, no autocomplete, cache results, switchable without an app update, ODbL attribution [policy][nom-policy] | `countrycodes=fi` filter; `viewbox` with optional `bounded=1` [API][nom-search] | `accept-language` parameter or header                                                          | Yes                    | None           | Worldwide; change `countrycodes` |
-| Photon, komoot public instance              | None           | "Please be fair"; extensive use is throttled or banned; no stated limit or SLA [home][photon-home] [README][photon-readme]                                    | `countrycode=FI`, `bbox`, or `lat`/`lon` focus [API][photon-api]                | `lang`; public dumps hold local, English, German and French names only [README][photon-readme] | No                     | Yes            | Worldwide; change `countrycode`  |
-| Digitransit (Finnish Pelias)                | Required       | Registration and subscription key; rate and quota limits since 2024-01-31 [portal][digitransit-reg]                                                           | Finland only                                                                    | Pelias `lang`                                                                                  | Not tested             | Not tested     | Finland only                     |
-| Bundled place index from the OSM importer   | None           | ODbL notice already shipped with the snapshot                                                                                                                 | Built per extract                                                               | `name`, `name:fi`, `name:sv`, `name:en`                                                        | Yes, if `name:sv` kept | Local fuzzy    | One index per configured extract |
-| Geoapify (optional)                         | Required       | Free plan 3,000 credits/day, 5 req/s, commercial use allowed, "Powered by Geoapify" plus OSM attribution [pricing][geo-pricing] [terms][geo-terms]            | `filter=countrycode:fi`, `bias`                                                 | `lang`                                                                                         | Yes                    | Weak           | Worldwide                        |
+| Candidate                                 | Key      | Terms for this app                                                                                                                                            | Finland bias                                                                    | Language                                                                                       | Swedish names          | Typo tolerance | Other regions                    |
+| ----------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------- | -------------- | -------------------------------- |
+| Nominatim, OSMF public instance           | None     | Max 1 req/s total, identifying Referer or User-Agent, no autocomplete, cache results, switchable without an app update, ODbL attribution [policy][nom-policy] | `countrycodes=fi` filter; `viewbox` with optional `bounded=1` [API][nom-search] | `accept-language` parameter or header                                                          | Yes                    | None           | Worldwide; change `countrycodes` |
+| Photon, komoot public instance            | None     | "Please be fair"; extensive use is throttled or banned; no stated limit or SLA [home][photon-home] [README][photon-readme]                                    | `countrycode=FI`, `bbox`, or `lat`/`lon` focus [API][photon-api]                | `lang`; public dumps hold local, English, German and French names only [README][photon-readme] | No                     | Yes            | Worldwide; change `countrycode`  |
+| Digitransit (Finnish Pelias)              | Required | Registration and subscription key; rate and quota limits since 2024-01-31 [portal][digitransit-reg]                                                           | Finland only                                                                    | Pelias `lang`                                                                                  | Not tested             | Not tested     | Finland only                     |
+| Bundled place index from the OSM importer | None     | ODbL notice already shipped with the snapshot                                                                                                                 | Built per extract                                                               | `name`, `name:fi`, `name:sv`, `name:en`                                                        | Yes, if `name:sv` kept | Local fuzzy    | One index per configured extract |
 
 Digitransit without a key returned HTTP 401 `Access denied due to missing subscription key`, so it
 is excluded. Its address search would add no coverage that Nominatim lacks for this app.
@@ -91,7 +89,6 @@ identifying User-Agent and Referer. The tiles were kept in `/tmp` only.
 | OpenFreeMap, `tiles.openfreemap.org`   | None                                           | Liberty style 200; vector tile 200, 415 KB, 0.96 s, Cloudflare       | MapLibre GL JS, or Leaflet with `@maplibre/maplibre-gl-leaflet` [quick start][ofm-quick] | 14, overzoomed by the client | `max-age=315360000`, immutable dated tileset    | OpenFreeMap © OpenMapTiles Data from OpenStreetMap; MapLibre adds it from the style |
 | OSM vector, `vector.openstreetmap.org` | None                                           | TileJSON 200; Shortbread tile 200, 342 KB                            | MapLibre with a Shortbread style that we would have to supply                            | 14                           | `max-age=300`                                   | © OpenStreetMap                                                                     |
 | CARTO basemaps                         | **Required since 2026-09-25** [FAQ][carto-faq] | 200, 2 KB PNG reading "API KEY REQUIRED · carto.com/basemaps/apikey" | Leaflet                                                                                  | —                            | —                                               | © OpenStreetMap contributors, © CARTO                                               |
-| Geoapify (optional)                    | Required                                       | Not fetched                                                          | Leaflet raster tiles or MapLibre style                                                   | 20                           | —                                               | Powered by Geoapify, © OpenMapTiles, © OpenStreetMap contributors                   |
 
 Request rules:
 
@@ -115,8 +112,7 @@ Request rules:
 | Photon (komoot)               | Search text, IP, User-Agent, Referer                                    | No Photon-specific policy. komoot's policy stores IP addresses for 90 days [komoot privacy][komoot-privacy]                                                               | Not stated for Photon                           |
 | OSM Standard and vector tiles | Viewport tiles (approximate area and zoom), IP, User-Agent, Referer     | As Nominatim; anonymised aggregate tile statistics are published                                                                                                          | Global CDN; the cache server depends on the CDN |
 | OpenFreeMap                   | Viewport tiles, IP, User-Agent, Referer                                 | No IPs in access logs; error logs with IP and URL kept 7 days; IP logging up to 30 days during incidents [privacy][ofm-privacy]                                           | Dedicated servers; may use Cloudflare           |
-| Geoapify (optional)           | Search text or tiles, IP, headers, API key                              | Request body, headers, IP and time kept for usage statistics, usually at most 24 hours for successful requests [privacy][geo-privacy]                                     | EU (Hetzner), Cloudflare and Bunny CDN          |
-| Apple MapKit (iOS map)        | Map viewport                    | Usage tied to an identifier that rotates several times an hour, not to the Apple Account; precise locations made less exact within 24 hours [Maps privacy][apple-privacy] | Apple                                           |
+| Apple MapKit (iOS map)        | Map viewport                                                            | Usage tied to an identifier that rotates several times an hour, not to the Apple Account; precise locations made less exact within 24 hours [Maps privacy][apple-privacy] | Apple                                           |
 
 None of these services receives the device location or the chosen origin coordinates from this
 app, because ranking is local. The map viewport still reveals the area being viewed.
@@ -150,9 +146,6 @@ adds a Geofabrik extract to the importer configuration and ships its snapshot an
 [photon-readme]: https://github.com/komoot/photon/blob/master/README.md
 [photon-api]: https://github.com/komoot/photon/blob/master/docs/api-v1.md
 [digitransit-reg]: https://digitransit.fi/en/developers/api-registration/
-[geo-pricing]: https://www.geoapify.com/pricing/
-[geo-terms]: https://www.geoapify.com/terms-and-conditions/
-[geo-privacy]: https://www.geoapify.com/privacy-policy/
 [tile-policy]: https://operations.osmfoundation.org/policies/tiles/
 [osm-vector]: https://operations.osmfoundation.org/policies/vector/
 [ofm-home]: https://openfreemap.org/
@@ -165,5 +158,3 @@ adds a Geofabrik extract to the importer configuration and ships its snapshot an
 [apple-privacy]: https://www.apple.com/legal/privacy/data/en/apple-maps/
 
 - OSM attribution guidelines: <https://osmfoundation.org/wiki/Licence/Attribution_Guidelines>
-- Geoapify browser keys "must be restricted to allowed origins in Geoapify MyProjects":
-  <https://www.geoapify.com/address-autocomplete/>

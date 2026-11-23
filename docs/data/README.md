@@ -131,4 +131,6 @@ suites check against the same file.
 The data is © OpenStreetMap contributors and is available under the Open Database License (ODbL)
 1.0. The snapshot, place index and coverage geometry are derived from OSM and published under
 the ODbL.
-`ODbL-NOTICE.txt` ships with both apps, and both apps show the attribution.
+The web build includes byte-for-byte copies of the three JSON files, the manifest, and
+`ODbL-NOTICE.txt` on its **Data and licence** page. The iOS build includes the same files, and
+its results link to the matching snapshot and notice in the public iOS repository.

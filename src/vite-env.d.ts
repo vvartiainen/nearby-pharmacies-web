@@ -9,8 +9,6 @@ interface ImportMetaEnv {
   readonly VITE_TILE_ATTRIBUTION?: string;
   /** Attribution link target; default https://www.openstreetmap.org/copyright. */
   readonly VITE_TILE_ATTRIBUTION_URL?: string;
-  readonly VITE_GEOCODER_PROVIDER?: string;
-  readonly VITE_GEOAPIFY_KEY?: string;
 }
 
 interface ImportMeta {
