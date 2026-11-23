@@ -63,6 +63,13 @@ update the file without rebuilding the app.
 The [data guide](docs/data/README.md) explains how to reproduce the snapshot and verify the iOS
 copies. The [design spec](docs/design/design-spec.md) defines both apps' interactions and copy.
 
+The app has three runtime dependencies: React, React DOM, and Leaflet. One `useReducer` holds the
+state shared across features, so a state library would add little. The pharmacy data is bundled,
+and the only remote calls are the geocoder configuration and submitted searches. Search keeps its
+own session cache and allows one request per second, without retries or background refetching, to
+stay within the Nominatim usage policy. A query library would need most of its defaults turned off
+here.
+
 ## Checks
 
 ```sh
