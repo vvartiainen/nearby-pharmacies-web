@@ -15,6 +15,10 @@ pin to see the pharmacy's address and weekly opening hours.
 Use Node 22.12+, 24, or 26+ and the pnpm version pinned in `package.json`. The default setup
 needs no account or API key.
 
+Run `nix develop` for Node 24, Corepack, and the data and hook tools. With direnv and nix-direnv
+configured, `direnv allow` loads the shell automatically. See [agent stop hooks](AGENTS.md#agent-stop-hooks)
+for Betterleaks setup and the history scan.
+
 ```sh
 pnpm install --frozen-lockfile
 pnpm run dev

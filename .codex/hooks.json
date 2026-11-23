@@ -1,5 +1,5 @@
 {
-  "description": "Check-only Oxlint and Oxfmt on changed and new files when a turn stops.",
+  "description": "Check style and scan for secrets when a turn stops.",
   "hooks": {
     "Stop": [
       {
@@ -9,6 +9,12 @@
             "command": "node \"$(git rev-parse --show-toplevel)/scripts/style-check.mjs\" --hook",
             "timeout": 60,
             "statusMessage": "Checking changed files with Oxlint and Oxfmt"
+          },
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/scripts/secret-scan.sh\" --hook",
+            "timeout": 60,
+            "statusMessage": "Scanning for secrets with Betterleaks"
           }
         ]
       }

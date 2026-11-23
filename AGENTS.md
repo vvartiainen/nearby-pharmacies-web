@@ -32,6 +32,12 @@ remove comments that restate the code.
 
 ## Setup
 
+From the repository root, run `nix develop` with flakes enabled. With direnv and nix-direnv
+configured in your shell, run `direnv allow` once to load it automatically when you enter the
+directory. The shell supports Apple Silicon Macs and Linux on x86-64 or ARM64. It provides
+Node 24, Corepack, Python 3, Betterleaks 1.x, Git, and jq. Corepack uses the pnpm version in
+`package.json` and may download it on first use.
+
 ```sh
 pnpm install --frozen-lockfile
 pnpm run test:ui:install
@@ -183,7 +189,7 @@ iOS repo. Commit both repos together. Regenerate the fixture's expected values o
 `python3 -I fixtures/ranking/compute_expected.py --write`, then
 `pnpm run format ./fixtures/ranking/ranking-v1.json`.
 
-## Agent stop hook
+## Agent stop hooks
 
 `scripts/style-check.mjs` checks tracked files with staged or unstaged changes plus untracked files
 that Git does not ignore. It skips deleted files, symlinks, `pnpm-lock.yaml`, the generated
@@ -212,7 +218,26 @@ looping.
   `node "$(git rev-parse --show-toplevel)/scripts/style-check.mjs" --hook` on `Stop`. Codex loads
   project hooks only from a trusted project: accept the trust prompt when you first open this
   repository. It also skips a new or changed hook until you trust its exact definition, so run
-  `/hooks` and trust this one after cloning and after each edit to `.codex/hooks.json`.
+  `/hooks` and trust the hooks after cloning or editing their definitions.
+
+### Secret scanning
+
+Both agents run `scripts/secret-scan.sh --hook` on `Stop` alongside the style check.
+Start the agent from the development shell so it inherits Betterleaks and jq on `PATH`.
+You can also install Betterleaks 1.x and jq separately.
+
+The scan checks tracked files and non-ignored untracked files in the working tree, plus
+staged additions and edits from Git's index. It runs locally. A finding requests one
+continuation and becomes a warning if it persists. A scan error also produces a warning.
+The hook gives a summary without printing the scanner's output.
+
+Run these from the repository root to view redacted findings and scan local Git history
+before publishing:
+
+```sh
+scripts/secret-scan.sh
+betterleaks git --log-opts=--all --redact=100 --verbose .
+```
 
 ## Commits
 

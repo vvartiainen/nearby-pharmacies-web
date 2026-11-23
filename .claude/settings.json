@@ -7,6 +7,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/scripts/style-check.mjs\" --hook",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PROJECT_DIR}/scripts/secret-scan.sh\" --hook",
+            "timeout": 60
           }
         ]
       }
