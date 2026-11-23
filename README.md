@@ -76,6 +76,14 @@ pnpm run test:ui
 Playwright covers desktop Chromium and narrow WebKit with stubbed map tiles, geocoding, and
 location. See [AGENTS.md](AGENTS.md) for test commands and configuration.
 
+### Continuous integration
+
+These checks run locally for this submission. A GitHub Actions workflow could run them on a Linux
+runner for pushes and pull requests, using the pinned pnpm version and a frozen lockfile. The
+workflow would install Chromium, WebKit, and their system dependencies with Playwright, then run
+lint and unit checks and test the production build in both browsers. It could upload traces when
+a browser test fails.
+
 ## Limitations
 
 - Distances are straight lines. Street-address search requires a network connection.
