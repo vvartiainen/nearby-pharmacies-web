@@ -22,6 +22,8 @@ function shouldOfferLocation() {
   }
 }
 
+export type OriginControlsApi = ReturnType<typeof useOriginControls>;
+
 /** Only the active operation may publish a result. Changing the origin invalidates both requests. */
 export function useOriginControls(locale: SupportedLocale, applyOrigin: (origin: Origin) => void) {
   const [geocoder] = useState(createGeocoder);

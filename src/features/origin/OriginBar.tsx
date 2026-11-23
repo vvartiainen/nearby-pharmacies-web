@@ -2,10 +2,10 @@ import { interpolate, type Messages } from "../../shared/i18n/messages";
 import { OriginControls } from "./OriginControls";
 import type { originCoverage } from "./coverage";
 import { defaultOrigin, type Origin } from "./origin";
-import type { useOriginControls } from "./useOriginControls";
+import type { OriginControlsApi } from "./useOriginControls";
 
 interface OriginBarProps {
-  readonly controls: ReturnType<typeof useOriginControls>;
+  readonly controls: OriginControlsApi;
   readonly coverage: ReturnType<typeof originCoverage>;
   readonly messages: Messages;
   readonly origin: Origin;

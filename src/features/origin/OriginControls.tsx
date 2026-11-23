@@ -3,7 +3,7 @@ import { useRef, useState, type FocusEvent } from "react";
 import type { Origin } from "./origin";
 import { interpolate, type Messages } from "../../shared/i18n/messages";
 import type { PlaceMatch } from "./geocoder";
-import type { useOriginControls } from "./useOriginControls";
+import type { OriginControlsApi } from "./useOriginControls";
 
 export function OriginControls({
   controls,
@@ -13,7 +13,7 @@ export function OriginControls({
   originTitle,
   originContext,
 }: {
-  controls: ReturnType<typeof useOriginControls>;
+  controls: OriginControlsApi;
   messages: Messages;
   origin: Origin;
   originLabel: string;
@@ -21,6 +21,8 @@ export function OriginControls({
   originContext: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  // The draft and highlighted match record the origin and matches they belong to, so a new origin
+  // or a new search result discards them during render without a reset effect.
   const [draft, setDraft] = useState<{ origin: Origin; text: string } | null>(null);
   const [editing, setEditing] = useState(false);
   const [activeMatch, setActiveMatch] = useState<{
